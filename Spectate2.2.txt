@@ -1,0 +1,183 @@
+-- Gui to Lua
+-- Version: 3.2
+
+-- Instances:
+
+local SpectateUI = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local Previous = Instance.new("TextButton")
+local Next = Instance.new("TextButton")
+local Close = Instance.new("TextButton")
+local TextLabel = Instance.new("TextLabel")
+local Spectating = Instance.new("TextLabel")
+local Goto = Instance.new("TextButton") -- Goto Button
+
+-- Properties:
+
+SpectateUI.Name = "SpectateUI"
+SpectateUI.Parent = game:GetService("CoreGui")
+
+Frame.Parent = SpectateUI
+Frame.BackgroundColor3 = Color3.fromRGB(36, 36, 37)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.36, 0, 0.66, 10)
+Frame.Size = UDim2.new(0, 340, 0, 80)
+
+Previous.Name = "Previous"
+Previous.Parent = Frame
+Previous.BackgroundColor3 = Color3.fromRGB(46, 46, 47)
+Previous.BorderSizePixel = 0
+Previous.Position = UDim2.new(0, 20, 0.25, 0)
+Previous.Size = UDim2.new(0, 50, 0, 50)
+Previous.Font = Enum.Font.SourceSans
+Previous.Text = "<"
+Previous.TextColor3 = Color3.fromRGB(255, 255, 255)
+Previous.TextScaled = true
+Previous.TextSize = 14.000
+Previous.TextWrapped = true
+Previous.ZIndex = 2
+
+Next.Name = "Next"
+Next.Parent = Frame
+Next.BackgroundColor3 = Color3.fromRGB(46, 46, 47)
+Next.BorderSizePixel = 0
+Next.Position = UDim2.new(0, 270, 0.25, 0)
+Next.Size = UDim2.new(0, 50, 0, 50)
+Next.Font = Enum.Font.SourceSans
+Next.Text = ">"
+Next.TextColor3 = Color3.fromRGB(255, 255, 255)
+Next.TextScaled = true
+Next.TextSize = 14.000
+Next.TextWrapped = true
+
+Close.Name = "Close"
+Close.Parent = Frame
+Close.BackgroundColor3 = Color3.fromRGB(46, 46, 47)
+Close.BorderSizePixel = 0
+Close.Position = UDim2.new(0, 320, 0, -20)
+Close.Size = UDim2.new(0, 40, 0, 40)
+Close.Font = Enum.Font.SourceSans
+Close.Text = "X"
+Close.TextColor3 = Color3.fromRGB(255, 255, 255)
+Close.TextScaled = true
+Close.TextSize = 14.000
+Close.TextWrapped = true
+
+TextLabel.Parent = Frame
+TextLabel.BackgroundColor3 = Color3.fromRGB(36, 36, 37)
+TextLabel.BorderSizePixel = 0
+TextLabel.Size = UDim2.new(0, 200, 0, 25)
+TextLabel.Font = Enum.Font.SourceSans
+TextLabel.Text = "View by smellyzach and Goto by MrMeme8"
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextScaled = true
+TextLabel.TextSize = 14.000
+TextLabel.TextWrapped = true
+
+Spectating.Name = "Spectating"
+Spectating.Parent = Frame
+Spectating.BackgroundColor3 = Color3.fromRGB(36, 36, 37)
+Spectating.BorderSizePixel = 0
+Spectating.Position = UDim2.new(0.206, 0, 0.25, 0)
+Spectating.Size = UDim2.new(0, 200, 0, 50)
+Spectating.Font = Enum.Font.SourceSans
+Spectating.Text = "Spectate"
+Spectating.TextColor3 = Color3.fromRGB(255, 255, 255)
+Spectating.TextScaled = true
+Spectating.TextSize = 14.000
+Spectating.TextWrapped = true
+
+Goto.Name = "Goto"
+Goto.Size = UDim2.new(0, 80, 0, 30)
+Goto.Position = UDim2.new(0, 125, 0, -30)
+Goto.BackgroundColor3 = Color3.fromRGB(46, 46, 47)
+Goto.BorderSizePixel = 0
+Goto.Text = "Goto"
+Goto.BackgroundTransparency = 0
+Goto.TextColor3 = Color3.fromRGB(255, 255, 255)
+Goto.Font = Enum.Font.Code
+Goto.Parent = Frame
+Goto.TextSize = 30
+
+-- Scripts:
+
+local function CLOSE_SCRIPT() -- Close.Script
+	local script = Instance.new('Script', Close)
+
+	script.Parent.MouseButton1Click:Connect(function()
+		local frame = script.Parent.Parent
+		if frame then
+			-- Reset the camera before destroying UI
+			local camera = game.Workspace.CurrentCamera
+			local localPlayer = game.Players.LocalPlayer
+			camera.CameraSubject = localPlayer.Character.Humanoid
+
+			-- Destroy the SpectateUI
+			local spectateUI = frame.Parent
+			if spectateUI then
+				spectateUI:Destroy()
+			end
+		end
+	end)
+end
+coroutine.wrap(CLOSE_SCRIPT)()
+
+local function SPECTATE_SCRIPT() -- Spectate Script
+	local script = Instance.new("LocalScript", SpectateUI)
+
+	local frame = script.Parent.Frame
+	local previous = frame.Previous
+	local next = frame.Next
+	local status = frame.Spectating
+	local camera = game.Workspace.CurrentCamera
+	local num = 1
+	local currentPlayer = game.Players.LocalPlayer
+
+	status.Text = currentPlayer.Name
+
+	local function updateSpectating(player)
+		camera.CameraSubject = player.Character.Humanoid
+		status.Text = player.Name
+	end
+
+	previous.MouseButton1Click:Connect(function()
+		local players = game:GetService("Players"):GetChildren()
+		local max = #players
+		num = num - 1
+		if num < 1 then
+			num = max
+		end
+		local player = players[num]
+		updateSpectating(player)
+	end)
+
+	next.MouseButton1Click:Connect(function()
+		local players = game:GetService("Players"):GetChildren()
+		local max = #players
+		num = num + 1
+		if num > max then
+			num = 1
+		end
+		local player = players[num]
+		updateSpectating(player)
+	end)
+
+	-- "Goto" button functionality
+	Goto.MouseButton1Click:Connect(function()
+		local players = game:GetService("Players"):GetChildren()
+		local targetPlayer = players[num] -- Get the player currently being spectated
+		if targetPlayer and targetPlayer.Character then
+			local targetPosition = targetPlayer.Character:WaitForChild("HumanoidRootPart").Position
+			currentPlayer.Character:SetPrimaryPartCFrame(CFrame.new(targetPosition)) -- Teleport the local player
+		end
+	end)
+
+	frame.Changed:Connect(function()
+		if not frame.Visible then
+			-- Reset the camera before destroying UI
+			camera.CameraSubject = currentPlayer.Character.Humanoid
+			script.Parent:Destroy()
+		end
+	end)
+end
+coroutine.wrap(SPECTATE_SCRIPT)()
