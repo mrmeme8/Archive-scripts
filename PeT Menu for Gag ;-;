@@ -30,11 +30,12 @@ local PlayerGui = player:WaitForChild("PlayerGui")
 local position = CFrame.new(42.027874, 0, 58.7933807)
 local equippedPets = {}
 
-local function getPetUUIDsByName(prefix)
+-- 🔍 Improved Pet Finder (now matches anywhere in name, case-insensitive)
+local function getPetUUIDsByName(searchText)
     local results = {}
     local function checkContainer(container)
         for _, tool in ipairs(container:GetChildren()) do
-            if tool:IsA("Tool") and tool.Name:sub(1, #prefix) == prefix then
+            if tool:IsA("Tool") and string.find(tool.Name:lower(), searchText:lower(), 1, true) then
                 local petId = tool:GetAttribute("PET_UUID")
                 if petId then
                     table.insert(results, petId)
@@ -47,6 +48,7 @@ local function getPetUUIDsByName(prefix)
     return results
 end
 
+-- 🔔 Notifications
 local function notify(message, color)
     local screenGui = Instance.new("ScreenGui")
     screenGui.Parent = PlayerGui
@@ -103,7 +105,7 @@ petNameBox.Size = UDim2.new(1, -10, 0, 30)
 petNameBox.Position = UDim2.new(0, 5, 0, 35)
 petNameBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
 petNameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-petNameBox.PlaceholderText = "Enter Pet Tool Name (e.g. Koi)"
+petNameBox.PlaceholderText = "Enter Pet Tool Name (e.g. Koi, Mimic)"
 petNameBox.Font = Enum.Font.SourceSansBold
 petNameBox.TextScaled = true
 
@@ -130,7 +132,13 @@ equipBtn.MouseButton1Click:Connect(function()
     local num = tonumber(numberBox.Text)
     if prefix == "" or not num or num < 1 or num > 8 then return end
     local pets = getPetUUIDsByName(prefix)
-    if #pets == 0 then return end
+
+    if #pets == 0 then
+        notify("⚠️ No pets found with name: " .. prefix, Color3.fromRGB(170, 0, 0))
+        return
+    end
+
+    notify("🔍 Found " .. #pets .. " pet(s) matching '" .. prefix .. "'", Color3.fromRGB(0, 120, 200))
 
     equippedPets = {}
     for i = 1, math.min(num, #pets) do
@@ -138,6 +146,8 @@ equipBtn.MouseButton1Click:Connect(function()
         table.insert(equippedPets, pets[i])
         task.wait(0.1)
     end
+
+    notify("✅ Equipped " .. math.min(num, #pets) .. " pet(s)", Color3.fromRGB(0, 170, 0))
 end)
 
 local unequipBtn = Instance.new("TextButton", frame)
@@ -150,13 +160,17 @@ unequipBtn.Font = Enum.Font.SourceSansBold
 unequipBtn.TextScaled = true
 
 unequipBtn.MouseButton1Click:Connect(function()
-    if #equippedPets == 0 then return end
+    if #equippedPets == 0 then
+        notify("⚠️ No pets tracked to unequip", Color3.fromRGB(170, 0, 0))
+        return
+    end
     local num = tonumber(numberBox.Text)
     if not num or num < 1 or num > 8 then return end
     for i = 1, math.min(num, #equippedPets) do
         PetsService:FireServer("UnequipPet", equippedPets[i])
         task.wait(0.1)
     end
+    notify("❌ Unequipped " .. math.min(num, #equippedPets) .. " pet(s)", Color3.fromRGB(170, 0, 0))
 end)
 
 local unequipAllBtn = Instance.new("TextButton", frame)
@@ -169,12 +183,16 @@ unequipAllBtn.Font = Enum.Font.SourceSansBold
 unequipAllBtn.TextScaled = true
 
 unequipAllBtn.MouseButton1Click:Connect(function()
-    if #equippedPets == 0 then return end
+    if #equippedPets == 0 then
+        notify("⚠️ No pets tracked to unequip", Color3.fromRGB(170, 0, 0))
+        return
+    end
     for _, petId in ipairs(equippedPets) do
         PetsService:FireServer("UnequipPet", petId)
         task.wait(0.1)
     end
     equippedPets = {}
+    notify("❌ Unequipped ALL pets", Color3.fromRGB(170, 0, 0))
 end)
 
 local credits = Instance.new("TextLabel", frame)
