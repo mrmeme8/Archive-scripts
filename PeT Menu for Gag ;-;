@@ -1,6 +1,6 @@
 --[[
 🐾 Pet Team Universal (Corrected Version)
-Equip + Save/Load Teams + Rename/Delete + Preview Toggle
+Equip + Save/Load Teams + Rename/Delete + Preview Toggle + Last Session Save
 Original by: MrMeme8 | Code: ChatDev
 Improved by: G
 --]]
@@ -33,6 +33,7 @@ PetTeamManager.__index = PetTeamManager
 -- Configuration (Easy to edit)
 local CONFIG = {
     SAVE_FILE = "PetTeams.json",
+    LAST_SESSION_FILE = "LastSession.json",
     MAX_PETS = 8,
     EQUIP_DELAY = 0.05,
     NOTIFY_DURATION = 2.5,
@@ -67,6 +68,7 @@ end
 PetTeamManager.equippedPets = {}
 PetTeamManager.selectedPets = {} -- Using a dictionary for faster lookups: { [uuid] = true }
 PetTeamManager.TeamsData = {}
+PetTeamManager.lastSessionPets = {}
 PetTeamManager.previewVisible = true
 PetTeamManager.autoSaveEnabled = true
 PetTeamManager.isMinimized = false
@@ -101,6 +103,33 @@ function PetTeamManager:SaveTeams()
     end
 end
 
+function PetTeamManager:LoadLastSession()
+    local data
+    if isfile and isfile(CONFIG.LAST_SESSION_FILE) then
+        local success, result = pcall(function()
+            return HttpService:JSONDecode(readfile(CONFIG.LAST_SESSION_FILE))
+        end)
+        if success and type(result) == "table" then
+            data = result
+        end
+    end
+    if not data and getgenv().LastSessionPets then
+        data = getgenv().LastSessionPets
+    end
+    self.lastSessionPets = data or {}
+end
+
+function PetTeamManager:SaveLastSession()
+    if not self.autoSaveEnabled then return end
+    getgenv().LastSessionPets = self.equippedPets
+    local success, encodedData = pcall(function()
+        return HttpService:JSONEncode(self.equippedPets)
+    end)
+    if success and writefile then
+        writefile(CONFIG.LAST_SESSION_FILE, encodedData)
+    end
+end
+
 ---
 --- 🔍 Core Logic
 ---
@@ -132,6 +161,7 @@ function PetTeamManager:EquipPets(petsToEquip)
         end
         task.wait(CONFIG.EQUIP_DELAY)
     end
+    self:SaveLastSession() -- Save equipped pets after action
 end
 
 function PetTeamManager:UnequipPets(petsToUnequip)
@@ -148,6 +178,7 @@ function PetTeamManager:UnequipPets(petsToUnequip)
         end
     end
     self.equippedPets = remainingEquipped
+    self:SaveLastSession() -- Save equipped pets after action
 end
 
 ---
@@ -214,7 +245,15 @@ function PetTeamManager:RefreshTeams()
         local unBtn = CreateElement("TextButton", { Parent = row, Size = UDim2.new(0, 28, 1, 0), Text = "📥", BackgroundColor3 = CONFIG.UI.Colors.Warning, TextColor3 = CONFIG.UI.Colors.Text, Font = CONFIG.UI.Font, TextScaled = true, LayoutOrder = 2 })
         local rnBtn = CreateElement("TextButton", { Parent = row, Size = UDim2.new(0, 28, 1, 0), Text = "📝", BackgroundColor3 = CONFIG.UI.Colors.Info, TextColor3 = CONFIG.UI.Colors.Text, Font = CONFIG.UI.Font, TextScaled = true, LayoutOrder = 3 })
         local delBtn = CreateElement("TextButton", { Parent = row, Size = UDim2.new(0, 28, 1, 0), Text = "🗑", BackgroundColor3 = CONFIG.UI.Colors.Error, TextColor3 = CONFIG.UI.Colors.Text, Font = CONFIG.UI.Font, TextScaled = true, LayoutOrder = 4 })
-        eqBtn.MouseButton1Click:Connect(function() self:EquipPets(pets); self:Notify("Equipped team: " .. teamName, CONFIG.UI.Colors.Success) end)
+        
+        -- FIX: Unequip current pets before equipping the new team's pets
+        eqBtn.MouseButton1Click:Connect(function()
+            self:UnequipPets(self.equippedPets)
+            self.equippedPets = {}
+            self:EquipPets(pets)
+            self:Notify("Equipped team: " .. teamName, CONFIG.UI.Colors.Success)
+        end)
+        
         unBtn.MouseButton1Click:Connect(function() self:UnequipPets(pets); self:Notify("Unequipped team: " .. teamName, CONFIG.UI.Colors.Warning) end)
         delBtn.MouseButton1Click:Connect(function() self.TeamsData[teamName] = nil; self:SaveTeams(); self:RefreshTeams(); self:Notify("Deleted team: " .. teamName, CONFIG.UI.Colors.Error) end)
         rnBtn.MouseButton1Click:Connect(function()
@@ -252,9 +291,10 @@ function PetTeamManager:Init()
     
     self.UI.PetNameBox = CreateElement("TextBox", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), PlaceholderText = "Filter by Pet Name", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Secondary, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 1 })
     self.UI.NumberBox = CreateElement("TextBox", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), PlaceholderText = "Equip Count (e.g., 4)", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Secondary, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, Text = tostring(CONFIG.MAX_PETS), LayoutOrder = 2 })
-    local equipBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "Equip Filtered/Selected", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Success, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 3 })
-    local unequipAllBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "Unequip All", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Error, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 4 })
-    local togglePreviewBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "👁 Preview: ON", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Success, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 5 })
+    local loadLastSessionBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "▶ Load Last Session", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Primary, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 3 })
+    local equipBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "Equip Filtered/Selected", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Success, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 4 })
+    local unequipAllBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "Unequip All", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Error, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 5 })
+    local togglePreviewBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "👁 Preview: ON", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Success, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 6 })
     
     self.UI.PreviewList = CreateElement("ScrollingFrame", { Parent = midCol, Size = UDim2.new(1, 0, 1, 0), BackgroundColor3 = CONFIG.UI.Colors.Primary, ScrollBarThickness = 8, CanvasSize = UDim2.new(), BorderSizePixel = 0 }); CreateElement("UICorner", { Parent = self.UI.PreviewList }); CreateElement("UIListLayout", { Parent = self.UI.PreviewList, Padding = UDim.new(0, 2), SortOrder = Enum.SortOrder.Name })
 
@@ -265,7 +305,7 @@ function PetTeamManager:Init()
 
     self.UI.NotificationLabel = CreateElement("TextLabel", { Parent = self.UI.ScreenGui, Size = UDim2.new(0, 320, 0, 45), Position = UDim2.new(0.5, -160, 0.85, 0), BackgroundColor3 = CONFIG.UI.Colors.Header, BackgroundTransparency = 1, TextColor3 = CONFIG.UI.Colors.Text, TextTransparency = 1, Font = CONFIG.UI.Font, TextScaled = true, Visible = false, ZIndex = 10 }); CreateElement("UICorner", { Parent = self.UI.NotificationLabel })
 
-    self:LoadTeams(); self:RefreshTeams(); self:RefreshPreview()
+    self:LoadTeams(); self:LoadLastSession(); self:RefreshTeams(); self:RefreshPreview()
 
     minimizeBtn.MouseButton1Click:Connect(function()
         self.isMinimized = not self.isMinimized
@@ -281,6 +321,18 @@ function PetTeamManager:Init()
         if self.previewVisible then self:RefreshPreview() end
     end)
     self.UI.PetNameBox:GetPropertyChangedSignal("Text"):Connect(function() self:RefreshPreview() end)
+
+    loadLastSessionBtn.MouseButton1Click:Connect(function()
+        if #self.lastSessionPets > 0 then
+            self:UnequipPets(self.equippedPets)
+            self.equippedPets = {}
+            self:EquipPets(self.lastSessionPets)
+            self:Notify(string.format("Loaded %d pets from your last session.", #self.lastSessionPets), CONFIG.UI.Colors.Info)
+        else
+            self:Notify("No last session pets found.", CONFIG.UI.Colors.Warning)
+        end
+    end)
+
     equipBtn.MouseButton1Click:Connect(function()
         local numToEquip = tonumber(self.UI.NumberBox.Text) or CONFIG.MAX_PETS; numToEquip = math.clamp(numToEquip, 1, CONFIG.MAX_PETS); local toEquip = {}
         for id, _ in pairs(self.selectedPets) do if #toEquip < numToEquip then table.insert(toEquip, id) end end
