@@ -1,74 +1,447 @@
 --[[
-🐾 Pet Equip Script
-Created by: MrMeme8
-Special thanks: ChatDev (AI helper that built and improved the system)
+🐾 Pet Team Universal
+Equip + Save/Load Teams + Rename/Delete + Preview Toggle
+Created by: MrMeme8 | Code: ChatDev
 ]]
 
--- Hidden Credits
-local hiddenCreditsTop = {
-    string.char(77,114,77,101,109,101,56),
-    string.char(67,104,97,116,68,101,118)
-}
-
-local A,B,C,D,E,F,G,H = 77,114,77,101,109,101,56,0
-local J,K,L,M,N,O,P   = 67,104,97,116,68,101,118
-
-local function reconstructSignature()
-    local name1 = string.char(A,B,C,D,E,F,G)
-    local name2 = string.char(J,K,L,M,N,O,P)
-    return name1, name2
-end
-
+-- Services
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
-local PetsService = ReplicatedStorage.GameEvents.PetsService
+local HttpService = game:GetService("HttpService")
+local CoreGui = game:GetService("CoreGui")
+local PetsService = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetsService")
 
 local player = Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 
-local position = CFrame.new(42.027874, 0, 58.7933807)
-local equippedPets = {}
+-- Vars
+local position = CFrame.new(42,0,58)
+local equippedPets, selectedPets = {}, {}
+local TeamsData = {}
+local saveFile = "PetTeams.json"
+local autoSaveEnabled = true
+local previewVisible = true
 
--- 🔍 Improved Pet Finder (now matches anywhere in name, case-insensitive)
-local function getPetUUIDsByName(searchText)
+-- 📂 Load/Save Teams
+local function loadTeams()
+    if isfile and isfile(saveFile) then
+        local ok, data = pcall(function()
+            return HttpService:JSONDecode(readfile(saveFile))
+        end)
+        if ok and type(data)=="table" then TeamsData = data end
+    elseif getgenv().PetTeams then
+        TeamsData = getgenv().PetTeams
+    end
+end
+local function saveTeams()
+    if not autoSaveEnabled then return end
+    local ok, data = pcall(function()
+        return HttpService:JSONEncode(TeamsData)
+    end)
+    if ok then
+        if writefile then writefile(saveFile, data) end
+        getgenv().PetTeams = TeamsData
+    end
+end
+
+-- 🔍 Find pets
+local function getPetToolsByName(prefix)
     local results = {}
-    local function checkContainer(container)
+    local function check(container)
         for _, tool in ipairs(container:GetChildren()) do
-            if tool:IsA("Tool") and string.find(tool.Name:lower(), searchText:lower(), 1, true) then
-                local petId = tool:GetAttribute("PET_UUID")
-                if petId then
-                    table.insert(results, petId)
-                end
+            if tool:IsA("Tool") and string.find(tool.Name:lower(), prefix:lower()) then
+                local id = tool:GetAttribute("PET_UUID")
+                if id then table.insert(results,{id=id,name=tool.Name}) end
             end
         end
     end
-    checkContainer(player.Backpack)
-    checkContainer(player.Character)
+    check(player.Backpack)
+    check(player.Character)
     return results
 end
 
--- 🔔 Notifications
-local function notify(message, color)
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Parent = PlayerGui
-
-    local textLabel = Instance.new("TextLabel")
-    textLabel.Parent = screenGui
-    textLabel.Size = UDim2.new(0, 300, 0, 50)
-    textLabel.Position = UDim2.new(0.5, -150, 0.75, 0)
-    textLabel.BackgroundTransparency = 0.3
-    textLabel.BackgroundColor3 = color or Color3.fromRGB(0, 0, 0)
-    textLabel.Text = message
-    textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    textLabel.TextScaled = true
-    textLabel.Font = Enum.Font.SourceSansBold
-
-    task.spawn(function()
-        task.wait(2)
-        screenGui:Destroy()
-    end)
+-- 🔔 Notify
+local function notify(msg,color)
+    local gui = Instance.new("ScreenGui")
+    gui.Parent = PlayerGui
+    local lbl = Instance.new("TextLabel", gui)
+    lbl.Size = UDim2.new(0,280,0,40)
+    lbl.Position = UDim2.new(0.5,-140,0.75,0)
+    lbl.BackgroundColor3 = color or Color3.fromRGB(0,0,0)
+    lbl.TextColor3 = Color3.fromRGB(255,255,255)
+    lbl.Font = Enum.Font.SourceSansBold
+    lbl.TextScaled = true
+    lbl.Text = msg
+    task.delay(2,function() gui:Destroy() end)
 end
+
+-- 🧹 Clear old GUI
+local old = PlayerGui:FindFirstChild("PetTeamUniversal") or CoreGui:FindFirstChild("PetTeamUniversal")
+if old then old:Destroy() end
+
+-- 🎨 GUI Root
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name="PetTeamUniversal"
+screenGui.ResetOnSpawn=false
+screenGui.Parent=PlayerGui
+
+local frame = Instance.new("Frame",screenGui)
+frame.Size=UDim2.new(0,550,0,340)
+frame.Position=UDim2.new(0.5,-275,0.5,-170)
+frame.BackgroundColor3=Color3.fromRGB(40,40,40)
+frame.Active=true frame.Draggable=true
+
+local title=Instance.new("TextLabel",frame)
+title.Size=UDim2.new(1,-30,0,30)
+title.Text="🐾 Pet Team Universal"
+title.BackgroundColor3=Color3.fromRGB(30,30,30)
+title.TextColor3=Color3.new(1,1,1)
+title.Font=Enum.Font.SourceSansBold
+title.TextScaled=true
+
+local minimizeBtn=Instance.new("TextButton",frame)
+minimizeBtn.Size=UDim2.new(0,30,0,30)
+minimizeBtn.Position=UDim2.new(1,-30,0,0)
+minimizeBtn.Text="−"
+minimizeBtn.BackgroundColor3=Color3.fromRGB(60,60,60)
+minimizeBtn.TextColor3=Color3.new(1,1,1)
+minimizeBtn.Font=Enum.Font.SourceSansBold
+minimizeBtn.TextScaled=true
+
+local minimized=false
+minimizeBtn.MouseButton1Click:Connect(function()
+    minimized=not minimized
+    for _,o in ipairs(frame:GetChildren()) do
+        if o~=title and o~=minimizeBtn then o.Visible=not minimized end
+    end
+    frame.Size=minimized and UDim2.new(0,200,0,30) or UDim2.new(0,550,0,340)
+    minimizeBtn.Text=minimized and "+" or "−"
+end)
+
+-- Inputs
+local petNameBox=Instance.new("TextBox",frame)
+petNameBox.Size=UDim2.new(0.33,-10,0,30)
+petNameBox.Position=UDim2.new(0,5,0,35)
+petNameBox.PlaceholderText="Enter Pet Tool Name"
+petNameBox.BackgroundColor3=Color3.fromRGB(70,70,70)
+petNameBox.TextColor3=Color3.new(1,1,1)
+petNameBox.Font=Enum.Font.SourceSansBold
+petNameBox.TextScaled=true
+
+local numberBox=Instance.new("TextBox",frame)
+numberBox.Size=UDim2.new(0.33,-10,0,30)
+numberBox.Position=UDim2.new(0,5,0,70)
+numberBox.PlaceholderText="Enter 1-8"
+numberBox.BackgroundColor3=Color3.fromRGB(70,70,70)
+numberBox.TextColor3=Color3.new(1,1,1)
+numberBox.Font=Enum.Font.SourceSansBold
+numberBox.TextScaled=true
+
+-- Buttons
+local equipBtn=Instance.new("TextButton",frame)
+equipBtn.Size=UDim2.new(0.33,-10,0,30)
+equipBtn.Position=UDim2.new(0,5,0,105)
+equipBtn.BackgroundColor3=Color3.fromRGB(0,120,0)
+equipBtn.Text="Equip Pet(s)"
+equipBtn.TextColor3=Color3.new(1,1,1)
+equipBtn.Font=Enum.Font.SourceSansBold
+equipBtn.TextScaled=true
+
+local unequipAllBtn=Instance.new("TextButton",frame)
+unequipAllBtn.Size=UDim2.new(0.33,-10,0,30)
+unequipAllBtn.Position=UDim2.new(0,5,0,140)
+unequipAllBtn.BackgroundColor3=Color3.fromRGB(180,0,0)
+unequipAllBtn.Text="Unequip ALL"
+unequipAllBtn.TextColor3=Color3.new(1,1,1)
+unequipAllBtn.Font=Enum.Font.SourceSansBold
+unequipAllBtn.TextScaled=true
+
+-- 👁 Toggle Preview
+local previewFrame = Instance.new("ScrollingFrame",frame)
+previewFrame.Size=UDim2.new(0.33,-10,1,-40)
+previewFrame.Position=UDim2.new(0.33,5,0,35)
+previewFrame.BackgroundColor3=Color3.fromRGB(50,50,50)
+previewFrame.ScrollBarThickness=6
+previewFrame.CanvasSize=UDim2.new(0,0,0,0)
+
+local togglePreview=Instance.new("TextButton",frame)
+togglePreview.Size=UDim2.new(0.33,-10,0,30)
+togglePreview.Position=UDim2.new(0,5,0,175) -- moved under Unequip ALL
+togglePreview.Text="👁 Preview: ON"
+togglePreview.BackgroundColor3=Color3.fromRGB(0,120,0)
+togglePreview.TextColor3=Color3.new(1,1,1)
+togglePreview.Font=Enum.Font.SourceSansBold
+togglePreview.TextScaled=true
+
+togglePreview.MouseButton1Click:Connect(function()
+    previewVisible=not previewVisible
+    previewFrame.Visible=previewVisible
+    togglePreview.Text=previewVisible and "👁 Preview: ON" or "👁 Preview: OFF"
+    togglePreview.BackgroundColor3=previewVisible and Color3.fromRGB(0,120,0) or Color3.fromRGB(180,0,0)
+    if previewVisible then refreshPreview(petNameBox.Text) end
+end)
+
+-- Teams
+local teamFrame=Instance.new("Frame",frame)
+teamFrame.Size=UDim2.new(0.33,-10,1,-40)
+teamFrame.Position=UDim2.new(0.66,5,0,35)
+teamFrame.BackgroundColor3=Color3.fromRGB(55,55,55)
+
+local teamList=Instance.new("ScrollingFrame",teamFrame)
+teamList.Size=UDim2.new(1,-10,1,-80)
+teamList.Position=UDim2.new(0,5,0,5)
+teamList.ScrollBarThickness=6
+
+local saveTeamBtn=Instance.new("TextButton",teamFrame)
+saveTeamBtn.Size=UDim2.new(1,-10,0,30)
+saveTeamBtn.Position=UDim2.new(0,5,1,-70)
+saveTeamBtn.Text="Save Team"
+saveTeamBtn.BackgroundColor3=Color3.fromRGB(0,120,0)
+saveTeamBtn.TextColor3=Color3.new(1,1,1)
+saveTeamBtn.Font=Enum.Font.SourceSansBold
+saveTeamBtn.TextScaled=true
+
+local credits=Instance.new("TextLabel",teamFrame)
+credits.Size=UDim2.new(1,-10,0,30)
+credits.Position=UDim2.new(0,5,1,-35)
+credits.BackgroundTransparency=1
+credits.Text="Made by MrMeme8 | Code: ChatDev"
+credits.TextColor3=Color3.fromRGB(200,200,200)
+credits.Font=Enum.Font.SourceSansItalic
+credits.TextScaled=true
+
+-- 🔄 Refresh Preview
+function refreshPreview(prefix)
+    for _,c in ipairs(previewFrame:GetChildren()) do
+        if c:IsA("TextButton") then c:Destroy() end
+    end
+    local pets=getPetToolsByName(prefix)
+    previewFrame.CanvasSize=UDim2.new(0,0,0,#pets*22)
+    for i,pet in ipairs(pets) do
+        local btn=Instance.new("TextButton",previewFrame)
+        btn.Size=UDim2.new(1,-5,0,20)
+        btn.Position=UDim2.new(0,2,0,(i-1)*22)
+        btn.BackgroundColor3=table.find(selectedPets,pet.id) and Color3.fromRGB(0,120,0) or Color3.fromRGB(60,60,60)
+        btn.Text=pet.name
+        btn.TextColor3=Color3.new(1,1,1)
+        btn.Font=Enum.Font.SourceSans
+        btn.TextSize=16
+
+        btn.MouseButton1Click:Connect(function()
+            if table.find(selectedPets,pet.id) then
+                for j,id in ipairs(selectedPets) do
+                    if id==pet.id then table.remove(selectedPets,j) break end
+                end
+                btn.BackgroundColor3=Color3.fromRGB(60,60,60)
+            else
+                if #selectedPets<8 then
+                    table.insert(selectedPets,pet.id)
+                    btn.BackgroundColor3=Color3.fromRGB(0,120,0)
+                else
+                    notify("Max 8 pets!",Color3.fromRGB(180,0,0))
+                end
+            end
+        end)
+    end
+end
+
+-- 🔄 Refresh Teams
+function refreshTeams()
+    for _,c in ipairs(teamList:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end
+    local i=0
+    for teamName,pets in pairs(TeamsData) do
+        i+=1
+        local row=Instance.new("Frame",teamList)
+        row.Size=UDim2.new(1,-5,0,28)
+        row.Position=UDim2.new(0,2,0,(i-1)*30)
+        row.BackgroundTransparency=1
+
+        local eqBtn=Instance.new("TextButton",row)
+        eqBtn.Size=UDim2.new(0.5,-5,1,0)
+        eqBtn.Text="▶ "..teamName
+        eqBtn.BackgroundColor3=Color3.fromRGB(80,80,80)
+        eqBtn.TextColor3=Color3.new(1,1,1)
+        eqBtn.Font=Enum.Font.SourceSansBold
+        eqBtn.TextScaled=true
+
+        local unBtn=Instance.new("TextButton",row)
+        unBtn.Size=UDim2.new(0.2,-5,1,0)
+        unBtn.Position=UDim2.new(0.5,5,0,0)
+        unBtn.Text="⏹"
+        unBtn.BackgroundColor3=Color3.fromRGB(180,0,0)
+        unBtn.TextColor3=Color3.new(1,1,1)
+
+        local rnBtn=Instance.new("TextButton",row)
+        rnBtn.Size=UDim2.new(0.15,-5,1,0)
+        rnBtn.Position=UDim2.new(0.7,5,0,0)
+        rnBtn.Text="✏️"
+        rnBtn.BackgroundColor3=Color3.fromRGB(0,90,180)
+        rnBtn.TextColor3=Color3.new(1,1,1)
+
+        local delBtn=Instance.new("TextButton",row)
+        delBtn.Size=UDim2.new(0.15,-5,1,0)
+        delBtn.Position=UDim2.new(0.85,5,0,0)
+        delBtn.Text="❌"
+        delBtn.BackgroundColor3=Color3.fromRGB(150,0,0)
+        delBtn.TextColor3=Color3.new(1,1,1)
+
+        eqBtn.MouseButton1Click:Connect(function()
+            equippedPets={}
+            for _,id in ipairs(pets) do
+                PetsService:FireServer("EquipPet",id,position)
+                table.insert(equippedPets,id)
+                task.wait(0.1)
+            end
+            notify("Equipped team: "..teamName,Color3.fromRGB(0,120,0))
+        end)
+
+        unBtn.MouseButton1Click:Connect(function()
+            for _,id in ipairs(pets) do
+                PetsService:FireServer("UnequipPet",id)
+                task.wait(0.1)
+            end
+            notify("Unequipped team: "..teamName,Color3.fromRGB(180,0,0))
+        end)
+
+        rnBtn.MouseButton1Click:Connect(function()
+            local inputBox=Instance.new("TextBox",row)
+            inputBox.Size=UDim2.new(1,0,1,0)
+            inputBox.Text=teamName
+            inputBox.BackgroundColor3=Color3.fromRGB(100,100,100)
+            inputBox.TextColor3=Color3.new(1,1,1)
+            inputBox.Font=Enum.Font.SourceSansBold
+            inputBox.TextScaled=true
+            inputBox.FocusLost:Connect(function(enter)
+                if enter and inputBox.Text~="" then
+                    if TeamsData[inputBox.Text] then
+                        notify("Name already exists!",Color3.fromRGB(180,0,0))
+                    else
+                        TeamsData[inputBox.Text]=TeamsData[teamName]
+                        TeamsData[teamName]=nil
+                        saveTeams()
+                        refreshTeams()
+                        notify("Renamed to: "..inputBox.Text,Color3.fromRGB(0,90,180))
+                    end
+                end
+                inputBox:Destroy()
+            end)
+        end)
+
+        delBtn.MouseButton1Click:Connect(function()
+            TeamsData[teamName]=nil
+            saveTeams()
+            refreshTeams()
+            notify("Deleted team: "..teamName,Color3.fromRGB(180,0,0))
+        end)
+    end
+    teamList.CanvasSize=UDim2.new(0,0,0,i*30)
+end
+
+-- 🔘 Logic
+equipBtn.MouseButton1Click:Connect(function()
+    local prefix=petNameBox.Text
+    local num=tonumber(numberBox.Text) or 8
+    num=math.clamp(num,1,8)
+    local pets=getPetToolsByName(prefix)
+    if #pets==0 then return end
+    equippedPets={}
+    local count=0
+    for _,id in ipairs(selectedPets) do
+        if count<num then
+            PetsService:FireServer("EquipPet",id,position)
+            table.insert(equippedPets,id)
+            count+=1
+            task.wait(0.1)
+        end
+    end
+    for _,p in ipairs(pets) do
+        if count>=num then break end
+        if not table.find(selectedPets,p.id) then
+            PetsService:FireServer("EquipPet",p.id,position)
+            table.insert(equippedPets,p.id)
+            count+=1
+            task.wait(0.1)
+        end
+    end
+end)
+
+unequipAllBtn.MouseButton1Click:Connect(function()
+    for _,id in ipairs(equippedPets) do
+        PetsService:FireServer("UnequipPet",id)
+        task.wait(0.1)
+    end
+    equippedPets={}
+end)
+
+saveTeamBtn.MouseButton1Click:Connect(function()
+    if #selectedPets==0 then return end
+    local inputBox=Instance.new("TextBox",teamFrame)
+    inputBox.Size=UDim2.new(1,-10,0,30)
+    inputBox.Position=UDim2.new(0,5,1,-110)
+    inputBox.PlaceholderText="Enter Team Name"
+    inputBox.BackgroundColor3=Color3.fromRGB(100,100,100)
+    inputBox.TextColor3=Color3.new(1,1,1)
+    inputBox.Font=Enum.Font.SourceSansBold
+    inputBox.TextScaled=true
+    inputBox.FocusLost:Connect(function(enter)
+        if enter and inputBox.Text~="" then
+            if TeamsData[inputBox.Text] then
+                notify("Name already exists!",Color3.fromRGB(180,0,0))
+            else
+                TeamsData[inputBox.Text]=table.clone(selectedPets)
+                saveTeams()
+                refreshTeams()
+                notify("Saved team: "..inputBox.Text,Color3.fromRGB(0,120,0))
+                selectedPets={} -- clear after save
+                refreshPreview(petNameBox.Text)
+            end
+        end
+        inputBox:Destroy()
+    end)
+end)
+
+-- Auto refresh preview
+petNameBox:GetPropertyChangedSignal("Text"):Connect(function()
+    if previewVisible then refreshPreview(petNameBox.Text) end
+end)
+
+-- Init
+loadTeams()
+refreshTeams()
+refreshPreview("")
+
+-- Manual Resize Controls (Width & Height)
+local resizeFrame = Instance.new("Frame", frame)
+resizeFrame.Size = UDim2.new(0.33, -10, 0, 35)
+resizeFrame.Position = UDim2.new(0, 5, 1, -40)
+resizeFrame.BackgroundColor3 = Color3.fromRGB(60,60,60)
+
+local widthBox = Instance.new("TextBox", resizeFrame)
+widthBox.Size = UDim2.new(0.5, -5, 1, -5)
+widthBox.Position = UDim2.new(0, 5, 0, 3)
+widthBox.PlaceholderText = "Width"
+widthBox.Text = tostring(frame.Size.X.Offset)
+widthBox.BackgroundColor3 = Color3.fromRGB(80,80,80)
+widthBox.TextColor3 = Color3.new(1,1,1)
+
+local heightBox = Instance.new("TextBox", resizeFrame)
+heightBox.Size = UDim2.new(0.5, -5, 1, -5)
+heightBox.Position = UDim2.new(0.5, 5, 0, 3)
+heightBox.PlaceholderText = "Height"
+heightBox.Text = tostring(frame.Size.Y.Offset)
+heightBox.BackgroundColor3 = Color3.fromRGB(80,80,80)
+heightBox.TextColor3 = Color3.new(1,1,1)
+
+-- Apply Resize
+local function applyResize()
+    local newW = tonumber(widthBox.Text) or frame.Size.X.Offset
+    local newH = tonumber(heightBox.Text) or frame.Size.Y.Offset
+    frame.Size = UDim2.new(0, newW, 0, newH)
+    frame.Position = UDim2.new(0.5, -newW/2, 0.5, -newH/2)
+end
+
+widthBox.FocusLost:Connect(applyResize)
+heightBox.FocusLost:Connect(applyResize)end
 
 -- GUI
 local screenGui = Instance.new("ScreenGui", PlayerGui)
