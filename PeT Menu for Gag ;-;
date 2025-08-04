@@ -1,0 +1,213 @@
+--[[
+🐾 Pet Equip Script
+Created by: MrMeme8
+Special thanks: ChatDev (AI helper that built and improved the system)
+]]
+
+-- Hidden Credits
+local hiddenCreditsTop = {
+    string.char(77,114,77,101,109,101,56),
+    string.char(67,104,97,116,68,101,118)
+}
+
+local A,B,C,D,E,F,G,H = 77,114,77,101,109,101,56,0
+local J,K,L,M,N,O,P   = 67,104,97,116,68,101,118
+
+local function reconstructSignature()
+    local name1 = string.char(A,B,C,D,E,F,G)
+    local name2 = string.char(J,K,L,M,N,O,P)
+    return name1, name2
+end
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local PetsService = ReplicatedStorage.GameEvents.PetsService
+
+local player = Players.LocalPlayer
+local PlayerGui = player:WaitForChild("PlayerGui")
+
+local position = CFrame.new(42.027874, 0, 58.7933807)
+local equippedPets = {}
+
+local function getPetUUIDsByName(prefix)
+    local results = {}
+    local function checkContainer(container)
+        for _, tool in ipairs(container:GetChildren()) do
+            if tool:IsA("Tool") and tool.Name:sub(1, #prefix) == prefix then
+                local petId = tool:GetAttribute("PET_UUID")
+                if petId then
+                    table.insert(results, petId)
+                end
+            end
+        end
+    end
+    checkContainer(player.Backpack)
+    checkContainer(player.Character)
+    return results
+end
+
+local function notify(message, color)
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Parent = PlayerGui
+
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Parent = screenGui
+    textLabel.Size = UDim2.new(0, 300, 0, 50)
+    textLabel.Position = UDim2.new(0.5, -150, 0.75, 0)
+    textLabel.BackgroundTransparency = 0.3
+    textLabel.BackgroundColor3 = color or Color3.fromRGB(0, 0, 0)
+    textLabel.Text = message
+    textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    textLabel.TextScaled = true
+    textLabel.Font = Enum.Font.SourceSansBold
+
+    task.spawn(function()
+        task.wait(2)
+        screenGui:Destroy()
+    end)
+end
+
+-- GUI
+local screenGui = Instance.new("ScreenGui", PlayerGui)
+screenGui.Name = "PetMenu"
+screenGui.ResetOnSpawn = false
+
+local frame = Instance.new("Frame", screenGui)
+frame.Size = UDim2.new(0, 220, 0, 260)
+frame.Position = UDim2.new(0.5, -110, 0.5, -130)
+frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+frame.BorderSizePixel = 2
+frame.Active = true
+frame.Draggable = true
+
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, -30, 0, 30)
+title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+title.Text = "🐾 Pet Menu"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.SourceSansBold
+title.TextScaled = true
+
+local minimizeBtn = Instance.new("TextButton", frame)
+minimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+minimizeBtn.Position = UDim2.new(1, -30, 0, 0)
+minimizeBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeBtn.Text = "−"
+minimizeBtn.Font = Enum.Font.SourceSansBold
+minimizeBtn.TextScaled = true
+
+local petNameBox = Instance.new("TextBox", frame)
+petNameBox.Size = UDim2.new(1, -10, 0, 30)
+petNameBox.Position = UDim2.new(0, 5, 0, 35)
+petNameBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+petNameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+petNameBox.PlaceholderText = "Enter Pet Tool Name (e.g. Koi)"
+petNameBox.Font = Enum.Font.SourceSansBold
+petNameBox.TextScaled = true
+
+local numberBox = Instance.new("TextBox", frame)
+numberBox.Size = UDim2.new(1, -10, 0, 30)
+numberBox.Position = UDim2.new(0, 5, 0, 70)
+numberBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+numberBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+numberBox.PlaceholderText = "Enter 1 - 8"
+numberBox.Font = Enum.Font.SourceSansBold
+numberBox.TextScaled = true
+
+local equipBtn = Instance.new("TextButton", frame)
+equipBtn.Size = UDim2.new(1, -10, 0, 30)
+equipBtn.Position = UDim2.new(0, 5, 0, 105)
+equipBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
+equipBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+equipBtn.Text = "Equip Pet(s)"
+equipBtn.Font = Enum.Font.SourceSansBold
+equipBtn.TextScaled = true
+
+equipBtn.MouseButton1Click:Connect(function()
+    local prefix = petNameBox.Text
+    local num = tonumber(numberBox.Text)
+    if prefix == "" or not num or num < 1 or num > 8 then return end
+    local pets = getPetUUIDsByName(prefix)
+    if #pets == 0 then return end
+
+    equippedPets = {}
+    for i = 1, math.min(num, #pets) do
+        PetsService:FireServer("EquipPet", pets[i], position)
+        table.insert(equippedPets, pets[i])
+        task.wait(0.1)
+    end
+end)
+
+local unequipBtn = Instance.new("TextButton", frame)
+unequipBtn.Size = UDim2.new(1, -10, 0, 30)
+unequipBtn.Position = UDim2.new(0, 5, 0, 140)
+unequipBtn.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+unequipBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+unequipBtn.Text = "Unequip Pet(s)"
+unequipBtn.Font = Enum.Font.SourceSansBold
+unequipBtn.TextScaled = true
+
+unequipBtn.MouseButton1Click:Connect(function()
+    if #equippedPets == 0 then return end
+    local num = tonumber(numberBox.Text)
+    if not num or num < 1 or num > 8 then return end
+    for i = 1, math.min(num, #equippedPets) do
+        PetsService:FireServer("UnequipPet", equippedPets[i])
+        task.wait(0.1)
+    end
+end)
+
+local unequipAllBtn = Instance.new("TextButton", frame)
+unequipAllBtn.Size = UDim2.new(1, -10, 0, 30)
+unequipAllBtn.Position = UDim2.new(0, 5, 0, 175)
+unequipAllBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
+unequipAllBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+unequipAllBtn.Text = "Unequip ALL"
+unequipAllBtn.Font = Enum.Font.SourceSansBold
+unequipAllBtn.TextScaled = true
+
+unequipAllBtn.MouseButton1Click:Connect(function()
+    if #equippedPets == 0 then return end
+    for _, petId in ipairs(equippedPets) do
+        PetsService:FireServer("UnequipPet", petId)
+        task.wait(0.1)
+    end
+    equippedPets = {}
+end)
+
+local credits = Instance.new("TextLabel", frame)
+credits.Size = UDim2.new(1, -10, 0, 25)
+credits.Position = UDim2.new(0, 5, 0, 210)
+credits.BackgroundTransparency = 1
+credits.Text = "Made by MrMeme8 | Code: ChatDev"
+credits.TextColor3 = Color3.fromRGB(200, 200, 200)
+credits.Font = Enum.Font.SourceSansItalic
+credits.TextScaled = true
+
+local minimized = false
+minimizeBtn.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    for _, obj in ipairs(frame:GetChildren()) do
+        if obj ~= title and obj ~= minimizeBtn then
+            obj.Visible = not minimized
+        end
+    end
+    frame.Size = minimized and UDim2.new(0, 220, 0, 30) or UDim2.new(0, 220, 0, 260)
+    minimizeBtn.Text = minimized and "+" or "−"
+end)
+
+UserInputService.InputBegan:Connect(function(input, gpe)
+    if not gpe and input.KeyCode == Enum.KeyCode.U then
+        frame.Visible = not frame.Visible
+    end
+end)
+
+local _dataDump = {
+    [1] = string.char(77,114,77,101,109,101,56),
+    [2] = string.char(67,104,97,116,68,101,118),
+}
+
+local n1, n2 = reconstructSignature()
+print("[Pet Menu] Credits:", n1, "&", n2)
