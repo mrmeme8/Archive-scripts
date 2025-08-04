@@ -1,74 +1,320 @@
 --[[
-🐾 Pet Team Universal
+🐾 Pet Team Universal (Corrected Version)
 Equip + Save/Load Teams + Rename/Delete + Preview Toggle
-Created by: MrMeme8 | Code: ChatDev
-]]
+Original by: MrMeme8 | Code: ChatDev
+Improved by: G
+--]]
 
 -- Services
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local CoreGui = game:GetService("CoreGui")
-local PetsService = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetsService")
+local TweenService = game:GetService("TweenService")
 
+-- Service Fallback for Executor Environments
+local function getService(serviceName)
+    local success, service = pcall(function()
+        return game:GetService(serviceName)
+    end)
+    return success and service
+end
+
+local PetsService = ReplicatedStorage and ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetsService")
+
+-- Player
 local player = Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 
--- Vars
-local position = CFrame.new(42,0,58)
-local equippedPets, selectedPets = {}, {}
-local TeamsData = {}
-local saveFile = "PetTeams.json"
-local autoSaveEnabled = true
-local previewVisible = true
+--// MODULE: PetTeamManager \\--
+local PetTeamManager = {}
+PetTeamManager.__index = PetTeamManager
 
--- 📂 Load/Save Teams
-local function loadTeams()
-    if isfile and isfile(saveFile) then
-        local ok, data = pcall(function()
-            return HttpService:JSONDecode(readfile(saveFile))
+-- Configuration (Easy to edit)
+local CONFIG = {
+    SAVE_FILE = "PetTeams.json",
+    MAX_PETS = 8,
+    EQUIP_DELAY = 0.05,
+    NOTIFY_DURATION = 2.5,
+    UI = {
+        Title = "🐾 Pet Team Universal",
+        Font = Enum.Font.SourceSansBold,
+        Colors = {
+            Background = Color3.fromRGB(40, 40, 40),
+            Header = Color3.fromRGB(30, 30, 30),
+            Primary = Color3.fromRGB(50, 50, 50),
+            Secondary = Color3.fromRGB(70, 70, 70),
+            Text = Color3.fromRGB(255, 255, 255),
+            Success = Color3.fromRGB(0, 150, 0),
+            Error = Color3.fromRGB(180, 0, 0),
+            Warning = Color3.fromRGB(200, 150, 0),
+            Info = Color3.fromRGB(0, 90, 180),
+        },
+        InitialSize = Vector2.new(550, 340)
+    }
+}
+
+-- Helper function for creating UI elements
+local function CreateElement(className, properties)
+    local element = Instance.new(className)
+    for prop, value in pairs(properties) do
+        element[prop] = value
+    end
+    return element
+end
+
+-- State
+PetTeamManager.equippedPets = {}
+PetTeamManager.selectedPets = {} -- Using a dictionary for faster lookups: { [uuid] = true }
+PetTeamManager.TeamsData = {}
+PetTeamManager.previewVisible = true
+PetTeamManager.autoSaveEnabled = true
+PetTeamManager.isMinimized = false
+
+---
+--- 📂 Data Persistence
+---
+function PetTeamManager:LoadTeams()
+    local data
+    if isfile and isfile(CONFIG.SAVE_FILE) then
+        local success, result = pcall(function()
+            return HttpService:JSONDecode(readfile(CONFIG.SAVE_FILE))
         end)
-        if ok and type(data)=="table" then TeamsData = data end
-    elseif getgenv().PetTeams then
-        TeamsData = getgenv().PetTeams
+        if success and type(result) == "table" then
+            data = result
+        end
     end
+    if not data and getgenv().PetTeams then
+        data = getgenv().PetTeams
+    end
+    self.TeamsData = data or {}
 end
-local function saveTeams()
-    if not autoSaveEnabled then return end
-    local ok, data = pcall(function()
-        return HttpService:JSONEncode(TeamsData)
+
+function PetTeamManager:SaveTeams()
+    if not self.autoSaveEnabled then return end
+    getgenv().PetTeams = self.TeamsData
+    local success, encodedData = pcall(function()
+        return HttpService:JSONEncode(self.TeamsData)
     end)
-    if ok then
-        if writefile then writefile(saveFile, data) end
-        getgenv().PetTeams = TeamsData
+    if success and writefile then
+        writefile(CONFIG.SAVE_FILE, encodedData)
     end
 end
 
--- 🔍 Find pets
-local function getPetToolsByName(prefix)
+---
+--- 🔍 Core Logic
+---
+function PetTeamManager:GetPetToolsByName(prefix)
     local results = {}
-    local function check(container)
+    local containers = { player.Backpack, player.Character }
+    prefix = prefix:lower()
+
+    for _, container in ipairs(containers) do
+        if not container then continue end
         for _, tool in ipairs(container:GetChildren()) do
-            if tool:IsA("Tool") and string.find(tool.Name:lower(), prefix:lower()) then
+            if tool:IsA("Tool") and tool.Name:lower():find(prefix, 1, true) then
                 local id = tool:GetAttribute("PET_UUID")
-                if id then table.insert(results,{id=id,name=tool.Name}) end
+                if id then
+                    table.insert(results, { id = id, name = tool.Name })
+                end
             end
         end
     end
-    check(player.Backpack)
-    check(player.Character)
+    table.sort(results, function(a, b) return a.name < b.name end)
     return results
 end
 
--- 🔔 Notify
-local function notify(msg,color)
-    local gui = Instance.new("ScreenGui")
-    gui.Parent = PlayerGui
-    local lbl = Instance.new("TextLabel", gui)
-    lbl.Size = UDim2.new(0,280,0,40)
-    lbl.Position = UDim2.new(0.5,-140,0.75,0)
-    lbl.BackgroundColor3 = color or Color3.fromRGB(0,0,0)
-    lbl.TextColor3 = Color3.fromRGB(255,255,255)
+function PetTeamManager:EquipPets(petsToEquip)
+    for _, id in ipairs(petsToEquip) do
+        PetsService:FireServer("EquipPet", id, CFrame.new(42, 0, 58))
+        if not table.find(self.equippedPets, id) then
+            table.insert(self.equippedPets, id)
+        end
+        task.wait(CONFIG.EQUIP_DELAY)
+    end
+end
+
+function PetTeamManager:UnequipPets(petsToUnequip)
+    local remainingEquipped = {}
+    local unequipSet = {}
+    for _, id in ipairs(petsToUnequip) do unequipSet[id] = true end
+
+    for _, id in ipairs(self.equippedPets) do
+        if unequipSet[id] then
+            PetsService:FireServer("UnequipPet", id)
+            task.wait(CONFIG.EQUIP_DELAY)
+        else
+            table.insert(remainingEquipped, id)
+        end
+    end
+    self.equippedPets = remainingEquipped
+end
+
+---
+--- 🎨 UI Management & Updates
+---
+function PetTeamManager:Notify(message, color, duration)
+    if not self.UI or not self.UI.NotificationLabel then return end
+    local label = self.UI.NotificationLabel
+    label.Text = message
+    label.BackgroundColor3 = color or CONFIG.UI.Colors.Header
+    label.Visible = true
+    TweenService:Create(label, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { TextTransparency = 0, BackgroundTransparency = 0.1 }):Play()
+    if self.notifyDebounce then task.cancel(self.notifyDebounce) end
+    self.notifyDebounce = task.delay(duration or CONFIG.NOTIFY_DURATION, function()
+        if label and label.Parent then
+            TweenService:Create(label, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { TextTransparency = 1, BackgroundTransparency = 1 }):Play()
+        end
+    end)
+end
+
+function PetTeamManager:RefreshPreview()
+    if not self.previewVisible then return end
+    local container = self.UI.PreviewList
+    container.CanvasPosition = Vector2.zero
+    for _, child in ipairs(container:GetChildren()) do
+        if child:IsA("GuiObject") then child:Destroy() end
+    end
+    local prefix = self.UI.PetNameBox.Text
+    local pets = self:GetPetToolsByName(prefix)
+    for _, pet in ipairs(pets) do
+        local isSelected = self.selectedPets[pet.id]
+        local btn = CreateElement("TextButton", { Name = pet.id, Text = " " .. pet.name, Parent = container, Size = UDim2.new(1, 0, 0, 22), BackgroundColor3 = isSelected and CONFIG.UI.Colors.Success or CONFIG.UI.Colors.Secondary, TextColor3 = CONFIG.UI.Colors.Text, Font = Enum.Font.SourceSans, TextSize = 15, TextXAlignment = Enum.TextXAlignment.Left })
+        btn.MouseButton1Click:Connect(function()
+            if self.selectedPets[pet.id] then
+                self.selectedPets[pet.id] = nil
+                btn.BackgroundColor3 = CONFIG.UI.Colors.Secondary
+            else
+                local count = 0; for _ in pairs(self.selectedPets) do count += 1 end
+                if count < CONFIG.MAX_PETS then
+                    self.selectedPets[pet.id] = true
+                    btn.BackgroundColor3 = CONFIG.UI.Colors.Success
+                else
+                    self:Notify(string.format("You can only select up to %d pets.", CONFIG.MAX_PETS), CONFIG.UI.Colors.Error)
+                end
+            end
+        end)
+    end
+    container.CanvasSize = UDim2.new(0, 0, 0, #pets * 24)
+end
+
+function PetTeamManager:RefreshTeams()
+    local container = self.UI.TeamList
+    container.CanvasPosition = Vector2.zero
+    for _, child in ipairs(container:GetChildren()) do
+        if child:IsA("Frame") then child:Destroy() end
+    end
+    local teamNames = {}; for name in pairs(self.TeamsData) do table.insert(teamNames, name) end
+    table.sort(teamNames)
+    for i, teamName in ipairs(teamNames) do
+        local pets = self.TeamsData[teamName]
+        local row = CreateElement("Frame", { Name = teamName, Parent = container, Size = UDim2.new(1, 0, 0, 28), BackgroundTransparency = 1 })
+        CreateElement("UIListLayout", { Parent = row, FillDirection = Enum.FillDirection.Horizontal, SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 4) })
+        local eqBtn = CreateElement("TextButton", { Parent = row, Size = UDim2.new(1, -98, 1, 0), Text = "▶ " .. teamName, BackgroundColor3 = CONFIG.UI.Colors.Secondary, TextColor3 = CONFIG.UI.Colors.Text, Font = CONFIG.UI.Font, TextXAlignment = Enum.TextXAlignment.Left, TextScaled = true, LayoutOrder = 1 })
+        local unBtn = CreateElement("TextButton", { Parent = row, Size = UDim2.new(0, 28, 1, 0), Text = "📥", BackgroundColor3 = CONFIG.UI.Colors.Warning, TextColor3 = CONFIG.UI.Colors.Text, Font = CONFIG.UI.Font, TextScaled = true, LayoutOrder = 2 })
+        local rnBtn = CreateElement("TextButton", { Parent = row, Size = UDim2.new(0, 28, 1, 0), Text = "📝", BackgroundColor3 = CONFIG.UI.Colors.Info, TextColor3 = CONFIG.UI.Colors.Text, Font = CONFIG.UI.Font, TextScaled = true, LayoutOrder = 3 })
+        local delBtn = CreateElement("TextButton", { Parent = row, Size = UDim2.new(0, 28, 1, 0), Text = "🗑", BackgroundColor3 = CONFIG.UI.Colors.Error, TextColor3 = CONFIG.UI.Colors.Text, Font = CONFIG.UI.Font, TextScaled = true, LayoutOrder = 4 })
+        eqBtn.MouseButton1Click:Connect(function() self:EquipPets(pets); self:Notify("Equipped team: " .. teamName, CONFIG.UI.Colors.Success) end)
+        unBtn.MouseButton1Click:Connect(function() self:UnequipPets(pets); self:Notify("Unequipped team: " .. teamName, CONFIG.UI.Colors.Warning) end)
+        delBtn.MouseButton1Click:Connect(function() self.TeamsData[teamName] = nil; self:SaveTeams(); self:RefreshTeams(); self:Notify("Deleted team: " .. teamName, CONFIG.UI.Colors.Error) end)
+        rnBtn.MouseButton1Click:Connect(function()
+            local input = CreateElement("TextBox", { Parent = row, Size = UDim2.new(1,0,1,0), Position = UDim2.new(), BackgroundColor3 = CONFIG.UI.Colors.Info, Text = teamName, TextColor3 = CONFIG.UI.Colors.Text, Font = CONFIG.UI.Font, TextScaled = true, ClearTextOnFocus = false, ZIndex = 3 }); input:CaptureFocus()
+            input.FocusLost:Connect(function(enter)
+                if enter and input.Text:len() > 0 and input.Text ~= teamName then
+                    if self.TeamsData[input.Text] then self:Notify("A team with that name already exists!", CONFIG.UI.Colors.Error)
+                    else self.TeamsData[input.Text] = self.TeamsData[teamName]; self.TeamsData[teamName] = nil; self:SaveTeams(); self:RefreshTeams(); self:Notify("Team renamed to '" .. input.Text .. "'", CONFIG.UI.Colors.Info) end
+                end; input:Destroy()
+            end)
+        end)
+    end
+    container.CanvasSize = UDim2.new(0, 0, 0, #teamNames * 30)
+end
+
+---
+--- 🚀 Initialization
+---
+function PetTeamManager:Init()
+    local oldGui = PlayerGui:FindFirstChild("PetTeamUniversal") or CoreGui:FindFirstChild("PetTeamUniversal"); if oldGui then oldGui:Destroy() end
+    self.UI = {}
+    self.UI.ScreenGui = CreateElement("ScreenGui", { Name = "PetTeamUniversal", Parent = PlayerGui, ResetOnSpawn = false, ZIndexBehavior = Enum.ZIndexBehavior.Sibling })
+    self.UI.MainFrame = CreateElement("Frame", { Name = "MainFrame", Parent = self.UI.ScreenGui, Size = UDim2.new(0, CONFIG.UI.InitialSize.X, 0, CONFIG.UI.InitialSize.Y), Position = UDim2.new(0.5, -CONFIG.UI.InitialSize.X / 2, 0.5, -CONFIG.UI.InitialSize.Y / 2), BackgroundColor3 = CONFIG.UI.Colors.Background, Active = true, Draggable = true })
+    CreateElement("UICorner", { CornerRadius = UDim.new(0, 6), Parent = self.UI.MainFrame })
+
+    local header = CreateElement("Frame", { Name = "Header", Parent = self.UI.MainFrame, Size = UDim2.new(1, 0, 0, 30), BackgroundColor3 = CONFIG.UI.Colors.Header })
+    CreateElement("TextLabel", { Name = "Title", Parent = header, Size = UDim2.new(1, -30, 1, 0), BackgroundColor3 = CONFIG.UI.Colors.Header, Font = CONFIG.UI.Font, Text = CONFIG.UI.Title, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true })
+    local minimizeBtn = CreateElement("TextButton", { Name = "MinimizeButton", Parent = header, Size = UDim2.new(0, 30, 1, 0), Position = UDim2.fromScale(1, 0), AnchorPoint = Vector2.new(1, 0), BackgroundColor3 = CONFIG.UI.Colors.Secondary, Text = "−", Font = CONFIG.UI.Font, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true })
+    
+    local contentFrame = CreateElement("Frame", { Name = "Content", Parent = self.UI.MainFrame, Size = UDim2.new(1, -10, 1, -40), Position = UDim2.new(0.5, 0, 0, 35), AnchorPoint = Vector2.new(0.5, 0), BackgroundTransparency = 1 })
+
+    local leftCol = CreateElement("Frame", { Name = "LeftColumn", Parent = contentFrame, Size = UDim2.new(0.33, -5, 1, 0), Position = UDim2.fromScale(0, 0), BackgroundTransparency = 1 }); CreateElement("UIListLayout", { Parent = leftCol, Padding = UDim.new(0, 5), SortOrder = Enum.SortOrder.LayoutOrder })
+    local midCol = CreateElement("Frame", { Name = "MidColumn", Parent = contentFrame, Size = UDim2.new(0.33, -5, 1, 0), Position = UDim2.fromScale(0.33, 0), BackgroundTransparency = 1 })
+    local rightCol = CreateElement("Frame", { Name = "RightColumn", Parent = contentFrame, Size = UDim2.new(0.33, 0, 1, 0), Position = UDim2.fromScale(0.66, 0), BackgroundTransparency = 1 }); CreateElement("UIListLayout", { Parent = rightCol, Padding = UDim.new(0, 5), SortOrder = Enum.SortOrder.LayoutOrder })
+    
+    self.UI.PetNameBox = CreateElement("TextBox", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), PlaceholderText = "Filter by Pet Name", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Secondary, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 1 })
+    self.UI.NumberBox = CreateElement("TextBox", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), PlaceholderText = "Equip Count (e.g., 4)", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Secondary, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, Text = tostring(CONFIG.MAX_PETS), LayoutOrder = 2 })
+    local equipBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "Equip Filtered/Selected", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Success, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 3 })
+    local unequipAllBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "Unequip All", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Error, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 4 })
+    local togglePreviewBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "👁 Preview: ON", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Success, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 5 })
+    
+    self.UI.PreviewList = CreateElement("ScrollingFrame", { Parent = midCol, Size = UDim2.new(1, 0, 1, 0), BackgroundColor3 = CONFIG.UI.Colors.Primary, ScrollBarThickness = 8, CanvasSize = UDim2.new(), BorderSizePixel = 0 }); CreateElement("UICorner", { Parent = self.UI.PreviewList }); CreateElement("UIListLayout", { Parent = self.UI.PreviewList, Padding = UDim.new(0, 2), SortOrder = Enum.SortOrder.Name })
+
+    local teamContainer = CreateElement("Frame", { Parent = rightCol, Size = UDim2.new(1, 0, 1, 0), BackgroundColor3 = CONFIG.UI.Colors.Primary, BorderSizePixel = 0 }); CreateElement("UICorner", { Parent = teamContainer }); CreateElement("UIPadding", { PaddingLeft = UDim.new(0, 5), PaddingRight = UDim.new(0, 5), PaddingTop = UDim.new(0, 5), PaddingBottom = UDim.new(0, 5), Parent = teamContainer })
+    self.UI.TeamList = CreateElement("ScrollingFrame", { Parent = teamContainer, Size = UDim2.new(1, 0, 1, -75), BackgroundColor3 = CONFIG.UI.Colors.Background, BorderSizePixel = 0, ScrollBarThickness = 8 }); CreateElement("UIListLayout", { Parent = self.UI.TeamList, Padding = UDim.new(0, 2) })
+    local saveTeamBtn = CreateElement("TextButton", { Parent = teamContainer, Size = UDim2.new(1, 0, 0, 30), Position = UDim2.new(0, 0, 1, -35), Text = "Save Selected as Team", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Success, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true })
+    CreateElement("TextLabel", { Parent = teamContainer, Size = UDim2.new(1, 0, 0, 30), Position = UDim2.new(-1.65, 0, 1, 0), AnchorPoint = Vector2.new(0.5, 1), Text = "[UI MrMeme8] [System ChatDev] [Improvements G]", BackgroundTransparency = 1, TextColor3 = Color3.fromRGB(180, 180, 180), Font = Enum.Font.SourceSansItalic, TextScaled = true })
+
+    self.UI.NotificationLabel = CreateElement("TextLabel", { Parent = self.UI.ScreenGui, Size = UDim2.new(0, 320, 0, 45), Position = UDim2.new(0.5, -160, 0.85, 0), BackgroundColor3 = CONFIG.UI.Colors.Header, BackgroundTransparency = 1, TextColor3 = CONFIG.UI.Colors.Text, TextTransparency = 1, Font = CONFIG.UI.Font, TextScaled = true, Visible = false, ZIndex = 10 }); CreateElement("UICorner", { Parent = self.UI.NotificationLabel })
+
+    self:LoadTeams(); self:RefreshTeams(); self:RefreshPreview()
+
+    minimizeBtn.MouseButton1Click:Connect(function()
+        self.isMinimized = not self.isMinimized
+        contentFrame.Visible = not self.isMinimized
+        minimizeBtn.Text = self.isMinimized and "+" or "−"
+        self.UI.MainFrame.Size = self.isMinimized and UDim2.new(0, 200, 0, 30) or UDim2.new(0, CONFIG.UI.InitialSize.X, 0, CONFIG.UI.InitialSize.Y)
+    end)
+    togglePreviewBtn.MouseButton1Click:Connect(function()
+        self.previewVisible = not self.previewVisible
+        midCol.Visible = self.previewVisible
+        togglePreviewBtn.Text = self.previewVisible and "🌕 Preview: ON" or "🌑 Preview: OFF"
+        togglePreviewBtn.BackgroundColor3 = self.previewVisible and CONFIG.UI.Colors.Success or CONFIG.UI.Colors.Error
+        if self.previewVisible then self:RefreshPreview() end
+    end)
+    self.UI.PetNameBox:GetPropertyChangedSignal("Text"):Connect(function() self:RefreshPreview() end)
+    equipBtn.MouseButton1Click:Connect(function()
+        local numToEquip = tonumber(self.UI.NumberBox.Text) or CONFIG.MAX_PETS; numToEquip = math.clamp(numToEquip, 1, CONFIG.MAX_PETS); local toEquip = {}
+        for id, _ in pairs(self.selectedPets) do if #toEquip < numToEquip then table.insert(toEquip, id) end end
+        if #toEquip < numToEquip then
+            local filteredPets = self:GetPetToolsByName(self.UI.PetNameBox.Text)
+            for _, pet in ipairs(filteredPets) do if #toEquip >= numToEquip then break end; if not self.selectedPets[pet.id] then table.insert(toEquip, pet.id) end end
+        end
+        if #toEquip > 0 then self:EquipPets(toEquip); self:Notify(string.format("Equipped %d pet(s).", #toEquip), CONFIG.UI.Colors.Success)
+        else self:Notify("No pets found or selected to equip.", CONFIG.UI.Colors.Warning) end
+    end)
+    unequipAllBtn.MouseButton1Click:Connect(function()
+        if #self.equippedPets == 0 then self:Notify("No pets are currently equipped.", CONFIG.UI.Colors.Warning); return end
+        local petsToUnequip = table.clone(self.equippedPets)
+        self:UnequipPets(petsToUnequip)
+        self.equippedPets = {}
+        self:Notify(string.format("Unequipped %d pet(s).", #petsToUnequip), CONFIG.UI.Colors.Error)
+    end)
+    saveTeamBtn.MouseButton1Click:Connect(function()
+        local selectedIds = {}; for id, _ in pairs(self.selectedPets) do table.insert(selectedIds, id) end
+        if #selectedIds == 0 then self:Notify("Select pets in the preview list to save a team.", CONFIG.UI.Colors.Warning); return end
+        local inputFrame = CreateElement("Frame", { Parent = self.UI.MainFrame, Size = UDim2.new(1,0,1,0), BackgroundColor3 = Color3.new(0,0,0), BackgroundTransparency = 0.4, ZIndex = 2 })
+        local inputBox = CreateElement("TextBox", { Parent = inputFrame, Size = UDim2.new(0.5, 0, 0, 40), Position = UDim2.fromScale(0.5, 0.4), AnchorPoint = Vector2.new(0.5, 0.5), PlaceholderText = "Enter New Team Name...", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Secondary, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true }); inputBox:CaptureFocus()
+        inputBox.FocusLost:Connect(function(enter)
+            if enter and inputBox.Text:len() > 0 then
+                local teamName = inputBox.Text
+                if self.TeamsData[teamName] then self:Notify("A team with that name already exists.", CONFIG.UI.Colors.Error)
+                else self.TeamsData[teamName] = selectedIds; self:SaveTeams(); self:RefreshTeams(); self:Notify("Saved team: " .. teamName, CONFIG.UI.Colors.Success); self.selectedPets = {}; self:RefreshPreview() end
+            end
+            inputFrame:Destroy()
+        end)
+    end)
+end
+
+PetTeamManager:Init()    lbl.TextColor3 = Color3.fromRGB(255,255,255)
     lbl.Font = Enum.Font.SourceSansBold
     lbl.TextScaled = true
     lbl.Text = msg
