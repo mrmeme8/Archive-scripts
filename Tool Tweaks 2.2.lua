@@ -1,0 +1,2057 @@
+local MrMEME = {};
+
+-- StarterGui.ToolTweaks
+MrMEME["1"] = Instance.new("ScreenGui", game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"));
+MrMEME["1"]["Name"] = [[ToolTweaks]];
+MrMEME["1"]["ZIndexBehavior"] = Enum.ZIndexBehavior.Sibling;
+MrMEME["1"]["ResetOnSpawn"] = false;
+
+-- StarterGui.ToolTweaks.Main
+MrMEME["2"] = Instance.new("Frame", MrMEME["1"]);
+MrMEME["2"]["BorderSizePixel"] = 0;
+MrMEME["2"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["2"]["Size"] = UDim2.new(0, 211, 0, 210);
+MrMEME["2"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["2"]["Position"] = UDim2.new(0.009449985809624195, 0, 0.010402219370007515, 0);
+MrMEME["2"]["Name"] = [[Main]];
+
+-- StarterGui.ToolTweaks.Main.UICorner
+MrMEME["3"] = Instance.new("UICorner", MrMEME["2"]);
+
+
+-- StarterGui.ToolTweaks.Main.UIGradient
+MrMEME["4"] = Instance.new("UIGradient", MrMEME["2"]);
+MrMEME["4"]["Rotation"] = 35;
+MrMEME["4"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(28, 28, 28)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(29, 86, 0))};
+
+-- StarterGui.ToolTweaks.Main.Title
+MrMEME["5"] = Instance.new("TextLabel", MrMEME["2"]);
+MrMEME["5"]["TextWrapped"] = true;
+MrMEME["5"]["BorderSizePixel"] = 0;
+MrMEME["5"]["TextScaled"] = true;
+MrMEME["5"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["5"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["5"]["TextSize"] = 22;
+MrMEME["5"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["5"]["AnchorPoint"] = Vector2.new(0.5, 0);
+MrMEME["5"]["Size"] = UDim2.new(0, 185, 0, 23);
+MrMEME["5"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["5"]["Text"] = [[Tool Tweaks]];
+MrMEME["5"]["Name"] = [[Title]];
+MrMEME["5"]["BackgroundTransparency"] = 1;
+MrMEME["5"]["Position"] = UDim2.new(0.5, 0, 0, 7);
+
+-- StarterGui.ToolTweaks.Main.Title.UIGradient
+MrMEME["6"] = Instance.new("UIGradient", MrMEME["5"]);
+MrMEME["6"]["Rotation"] = 180;
+MrMEME["6"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(46, 210, 0))};
+
+-- StarterGui.ToolTweaks.Main.
+MrMEME["7"] = Instance.new("Frame", MrMEME["2"]);
+MrMEME["7"]["BorderSizePixel"] = 0;
+MrMEME["7"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["7"]["AnchorPoint"] = Vector2.new(0.5, 0);
+MrMEME["7"]["Size"] = UDim2.new(0, 191, 0, 2);
+MrMEME["7"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["7"]["Position"] = UDim2.new(0.5, 0, 0, 33);
+MrMEME["7"]["Name"] = [[]];
+
+-- StarterGui.ToolTweaks.Main..UIGradient
+MrMEME["8"] = Instance.new("UIGradient", MrMEME["7"]);
+MrMEME["8"]["Rotation"] = 180;
+MrMEME["8"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(98, 98, 98)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(35, 107, 0))};
+
+-- StarterGui.ToolTweaks.Main.DropShadowHolder
+MrMEME["9"] = Instance.new("Frame", MrMEME["2"]);
+MrMEME["9"]["ZIndex"] = 0;
+MrMEME["9"]["BorderSizePixel"] = 0;
+MrMEME["9"]["BackgroundTransparency"] = 1;
+MrMEME["9"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["9"]["Name"] = [[DropShadowHolder]];
+
+-- StarterGui.ToolTweaks.Main.DropShadowHolder.DropShadow
+MrMEME["a"] = Instance.new("ImageLabel", MrMEME["9"]);
+MrMEME["a"]["ZIndex"] = 0;
+MrMEME["a"]["BorderSizePixel"] = 0;
+MrMEME["a"]["SliceCenter"] = Rect.new(49, 49, 450, 450);
+MrMEME["a"]["ScaleType"] = Enum.ScaleType.Slice;
+MrMEME["a"]["ImageColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["a"]["ImageTransparency"] = 0.5;
+MrMEME["a"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["a"]["Image"] = [[rbxassetid://6014261993]];
+MrMEME["a"]["Size"] = UDim2.new(1, 47, 1, 47);
+MrMEME["a"]["Name"] = [[DropShadow]];
+MrMEME["a"]["BackgroundTransparency"] = 1;
+MrMEME["a"]["Position"] = UDim2.new(0.5, 0, 0.5, 0);
+
+-- StarterGui.ToolTweaks.Main.Tools
+MrMEME["b"] = Instance.new("Frame", MrMEME["2"]);
+MrMEME["b"]["BorderSizePixel"] = 0;
+MrMEME["b"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["b"]["BackgroundTransparency"] = 1;
+MrMEME["b"]["Size"] = UDim2.new(1, 0, 0.8556700944900513, 0);
+MrMEME["b"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["b"]["Position"] = UDim2.new(0, 0, 0, 40);
+MrMEME["b"]["Name"] = [[Tools]];
+
+-- StarterGui.ToolTweaks.Main.Tools.UIListLayout
+MrMEME["c"] = Instance.new("UIListLayout", MrMEME["b"]);
+MrMEME["c"]["HorizontalAlignment"] = Enum.HorizontalAlignment.Center;
+MrMEME["c"]["Padding"] = UDim.new(0, 5);
+MrMEME["c"]["SortOrder"] = Enum.SortOrder.LayoutOrder;
+
+-- StarterGui.ToolTweaks.Main.Tools.RotationUtils (Existing button for discrete rotation)
+MrMEME["d"] = Instance.new("TextButton", MrMEME["b"]);
+MrMEME["d"]["BorderSizePixel"] = 0;
+MrMEME["d"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["d"]["TextSize"] = 14;
+MrMEME["d"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["d"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["d"]["Size"] = UDim2.new(0, 192, 0, 23);
+MrMEME["d"]["Name"] = [[RotationUtils]];
+MrMEME["d"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["d"]["Text"] = [[]];
+MrMEME["d"]["Position"] = UDim2.new(0.02606634981930256, 0, 0, 0);
+
+-- StarterGui.ToolTweaks.Main.Tools.RotationUtils.UICorner
+MrMEME["e"] = Instance.new("UICorner", MrMEME["d"]);
+MrMEME["e"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.Main.Tools.RotationUtils.UIGradient
+MrMEME["f"] = Instance.new("UIGradient", MrMEME["d"]);
+MrMEME["f"]["Rotation"] = 9;
+MrMEME["f"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 142, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(73, 218, 0))};
+
+-- StarterGui.ToolTweaks.Main.Tools.RotationUtils.Title
+MrMEME["10"] = Instance.new("TextLabel", MrMEME["d"]);
+MrMEME["10"]["TextWrapped"] = true;
+MrMEME["10"]["BorderSizePixel"] = 0;
+MrMEME["10"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["10"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["10"]["TextSize"] = 15;
+MrMEME["10"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["10"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["10"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["10"]["Text"] = [[Rotation (Buttons)]];
+MrMEME["10"]["Name"] = [[Title]];
+MrMEME["10"]["BackgroundTransparency"] = 1;
+
+-- StarterGui.ToolTweaks.Main.Tools.RotationUtils.Title.UIGradient
+MrMEME["11"] = Instance.new("UIGradient", MrMEME["10"]);
+MrMEME["11"]["Rotation"] = 180;
+MrMEME["11"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(56, 255, 0))};
+
+-- StarterGui.ToolTweaks.Main.Tools.PositionUtils (Existing button for discrete position)
+MrMEME["12"] = Instance.new("TextButton", MrMEME["b"]);
+MrMEME["12"]["BorderSizePixel"] = 0;
+MrMEME["12"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["12"]["TextSize"] = 14;
+MrMEME["12"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["12"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["12"]["Size"] = UDim2.new(0, 192, 0, 23);
+MrMEME["12"]["Name"] = [[PositionUtils]];
+MrMEME["12"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["12"]["Text"] = [[]];
+MrMEME["12"]["Position"] = UDim2.new(0.02606634981930256, 0, 0, 0);
+
+-- StarterGui.ToolTweaks.Main.Tools.PositionUtils.UICorner
+MrMEME["13"] = Instance.new("UICorner", MrMEME["12"]);
+MrMEME["13"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.Main.Tools.PositionUtils.UIGradient
+MrMEME["14"] = Instance.new("UIGradient", MrMEME["12"]);
+MrMEME["14"]["Rotation"] = 9;
+MrMEME["14"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 142, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(73, 218, 0))};
+
+-- StarterGui.ToolTweaks.Main.Tools.PositionUtils.Title
+MrMEME["15"] = Instance.new("TextLabel", MrMEME["12"]);
+MrMEME["15"]["TextWrapped"] = true;
+MrMEME["15"]["BorderSizePixel"] = 0;
+MrMEME["15"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["15"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["15"]["TextSize"] = 15;
+MrMEME["15"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["15"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["15"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["15"]["Text"] = [[Position (Buttons)]];
+MrMEME["15"]["Name"] = [[Title]];
+MrMEME["15"]["BackgroundTransparency"] = 1;
+
+-- StarterGui.ToolTweaks.Main.Tools.PositionUtils.Title.UIGradient
+MrMEME["16"] = Instance.new("UIGradient", MrMEME["15"]);
+MrMEME["16"]["Rotation"] = 180;
+MrMEME["16"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(56, 255, 0))};
+
+-- StarterGui.ToolTweaks.Main.Tools.
+MrMEME["17"] = Instance.new("Frame", MrMEME["b"]);
+MrMEME["17"]["BorderSizePixel"] = 0;
+MrMEME["17"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["17"]["AnchorPoint"] = Vector2.new(0.5, 0);
+MrMEME["17"]["Size"] = UDim2.new(0, 191, 0, 2);
+MrMEME["17"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["17"]["Position"] = UDim2.new(0.5, 0, 0, 33);
+MrMEME["17"]["Name"] = [[]];
+
+-- StarterGui.ToolTweaks.Main.Tools..UIGradient
+MrMEME["18"] = Instance.new("UIGradient", MrMEME["17"]);
+MrMEME["18"]["Rotation"] = 180;
+MrMEME["18"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(98, 98, 98)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(35, 107, 0))};
+
+-- StarterGui.ToolTweaks.Main.Tools.SliderR (Replaced DeleteTool)
+MrMEME["19"] = Instance.new("TextButton", MrMEME["b"]);
+MrMEME["19"]["BorderSizePixel"] = 0;
+MrMEME["19"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["19"]["TextSize"] = 14;
+MrMEME["19"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["19"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["19"]["Size"] = UDim2.new(0, 192, 0, 23);
+MrMEME["19"]["Name"] = [[SliderR]];
+MrMEME["19"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["19"]["Text"] = [[]];
+MrMEME["19"]["Position"] = UDim2.new(0.02606634981930256, 0, 0, 0);
+
+-- StarterGui.ToolTweaks.Main.Tools.SliderR.UICorner
+MrMEME["1a"] = Instance.new("UICorner", MrMEME["19"]);
+MrMEME["1a"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.Main.Tools.SliderR.UIGradient
+MrMEME["1b"] = Instance.new("UIGradient", MrMEME["19"]);
+MrMEME["1b"]["Rotation"] = 9;
+MrMEME["1b"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 142, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(73, 218, 0))};
+
+-- StarterGui.ToolTweaks.Main.Tools.SliderR.Title
+MrMEME["1c"] = Instance.new("TextLabel", MrMEME["19"]);
+MrMEME["1c"]["TextWrapped"] = true;
+MrMEME["1c"]["BorderSizePixel"] = 0;
+MrMEME["1c"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["1c"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["1c"]["TextSize"] = 15;
+MrMEME["1c"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["1c"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["1c"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["1c"]["Text"] = [[Slider R (Rotation)]];
+MrMEME["1c"]["Name"] = [[Title]];
+MrMEME["1c"]["BackgroundTransparency"] = 1;
+
+-- StarterGui.ToolTweaks.Main.Tools.SliderR.Title.UIGradient
+MrMEME["1d"] = Instance.new("UIGradient", MrMEME["1c"]);
+MrMEME["1d"]["Rotation"] = 180;
+MrMEME["1d"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(56, 255, 0))};
+
+-- StarterGui.ToolTweaks.Main.Tools.SliderP (Replaced DeleteTools)
+MrMEME["1e"] = Instance.new("TextButton", MrMEME["b"]);
+MrMEME["1e"]["BorderSizePixel"] = 0;
+MrMEME["1e"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["1e"]["TextSize"] = 14;
+MrMEME["1e"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["1e"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["1e"]["Size"] = UDim2.new(0, 192, 0, 23);
+MrMEME["1e"]["Name"] = [[SliderP]];
+MrMEME["1e"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["1e"]["Text"] = [[]];
+MrMEME["1e"]["Position"] = UDim2.new(0.02606634981930256, 0, 0, 0);
+
+-- StarterGui.ToolTweaks.Main.Tools.SliderP.UICorner
+MrMEME["1f"] = Instance.new("UICorner", MrMEME["1e"]);
+MrMEME["1f"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.Main.Tools.SliderP.UIGradient
+MrMEME["20"] = Instance.new("UIGradient", MrMEME["1e"]);
+MrMEME["20"]["Rotation"] = 9;
+MrMEME["20"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 142, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(73, 218, 0))};
+
+-- StarterGui.ToolTweaks.Main.Tools.SliderP.Title
+MrMEME["21"] = Instance.new("TextLabel", MrMEME["1e"]);
+MrMEME["21"]["TextWrapped"] = true;
+MrMEME["21"]["BorderSizePixel"] = 0;
+MrMEME["21"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["21"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["21"]["TextSize"] = 15;
+MrMEME["21"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["21"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["21"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["21"]["Text"] = [[Slider P (Position)]];
+MrMEME["21"]["Name"] = [[Title]];
+MrMEME["21"]["BackgroundTransparency"] = 1;
+
+-- StarterGui.ToolTweaks.Main.Tools.SliderP.Title.UIGradient
+MrMEME["22"] = Instance.new("UIGradient", MrMEME["21"]);
+MrMEME["22"]["Rotation"] = 180;
+MrMEME["22"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(56, 255, 0))};
+
+-- StarterGui.ToolTweaks.Main.Tools.EquipAll
+MrMEME["23"] = Instance.new("TextButton", MrMEME["b"]);
+MrMEME["23"]["BorderSizePixel"] = 0;
+MrMEME["23"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["23"]["TextSize"] = 14;
+MrMEME["23"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["23"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["23"]["Size"] = UDim2.new(0, 192, 0, 23);
+MrMEME["23"]["Name"] = [[EquipAll]];
+MrMEME["23"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["23"]["Text"] = [[]];
+MrMEME["23"]["Position"] = UDim2.new(0.02606634981930256, 0, 0, 0);
+
+-- StarterGui.ToolTweaks.Main.Tools.EquipAll.UICorner
+MrMEME["24"] = Instance.new("UICorner", MrMEME["23"]);
+MrMEME["24"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.Main.Tools.EquipAll.UIGradient
+MrMEME["25"] = Instance.new("UIGradient", MrMEME["23"]);
+MrMEME["25"]["Rotation"] = 9;
+MrMEME["25"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 142, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(73, 218, 0))};
+
+-- StarterGui.ToolTweaks.Main.Tools.EquipAll.Title
+MrMEME["26"] = Instance.new("TextLabel", MrMEME["23"]);
+MrMEME["26"]["TextWrapped"] = true;
+MrMEME["26"]["BorderSizePixel"] = 0;
+MrMEME["26"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["26"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["26"]["TextSize"] = 15;
+MrMEME["26"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["26"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["26"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["26"]["Text"] = [[Equip All Tools]];
+MrMEME["26"]["Name"] = [[Title]];
+MrMEME["26"]["BackgroundTransparency"] = 1;
+
+-- StarterGui.ToolTweaks.Main.Tools.EquipAll.Title.UIGradient
+MrMEME["27"] = Instance.new("UIGradient", MrMEME["26"]);
+MrMEME["27"]["Rotation"] = 180;
+MrMEME["27"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(56, 255, 0))};
+
+-- StarterGui.ToolTweaks.Main.MainHandler
+MrMEME["28"] = Instance.new("LocalScript", MrMEME["2"]);
+MrMEME["28"]["Name"] = [[MainHandler]];
+
+-- StarterGui.ToolTweaks.Main.Credits
+MrMEME["29"] = Instance.new("TextLabel", MrMEME["2"]);
+MrMEME["29"]["TextWrapped"] = true;
+MrMEME["29"]["BorderSizePixel"] = 0;
+MrMEME["29"]["TextScaled"] = true;
+MrMEME["29"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["29"]["TextXAlignment"] = Enum.TextXAlignment.Left;
+MrMEME["29"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["29"]["TextTransparency"] = 0.699999988079071;
+MrMEME["29"]["TextSize"] = 22;
+MrMEME["29"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["29"]["AnchorPoint"] = Vector2.new(0, 1);
+MrMEME["29"]["Size"] = UDim2.new(0, 119, 0, 11);
+MrMEME["29"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["29"]["Text"] = [[MrMeme]];
+MrMEME["29"]["Name"] = [[Credits]];
+MrMEME["29"]["BackgroundTransparency"] = 1;
+MrMEME["29"]["Position"] = UDim2.new(0.019999999552965164, 0, 0.9580000042915344, 7);
+
+-- StarterGui.ToolTweaks.Main.Credits.UIGradient
+MrMEME["2a"] = Instance.new("UIGradient", MrMEME["29"]);
+MrMEME["2a"]["Rotation"] = 180;
+MrMEME["2a"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(46, 210, 0))};
+
+-- StarterGui.ToolTweaks.RotationUtils (Existing rotation utility frame)
+MrMEME["2b"] = Instance.new("Frame", MrMEME["1"]);
+MrMEME["2b"]["BorderSizePixel"] = 0;
+MrMEME["2b"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["2b"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["2b"]["Size"] = UDim2.new(0, 169, 0, 200);
+MrMEME["2b"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["2b"]["Position"] = UDim2.new(0.5, 0, 0.5, 0);
+MrMEME["2b"]["Visible"] = false;
+MrMEME["2b"]["Name"] = [[RotationUtils]];
+
+-- StarterGui.ToolTweaks.RotationUtils.UICorner
+MrMEME["2c"] = Instance.new("UICorner", MrMEME["2b"]);
+
+
+-- StarterGui.ToolTweaks.RotationUtils.UIGradient
+MrMEME["2d"] = Instance.new("UIGradient", MrMEME["2b"]);
+MrMEME["2d"]["Rotation"] = 35;
+MrMEME["2d"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(28, 28, 28)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(29, 86, 0))};
+
+-- StarterGui.ToolTweaks.RotationUtils.Up
+MrMEME["2e"] = Instance.new("TextButton", MrMEME["2b"]);
+MrMEME["2e"]["BorderSizePixel"] = 0;
+MrMEME["2e"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["2e"]["TextSize"] = 14;
+MrMEME["2e"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["2e"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["2e"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["2e"]["Size"] = UDim2.new(0, 45, 0, 45);
+MrMEME["2e"]["Name"] = [[Up]];
+MrMEME["2e"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["2e"]["Text"] = [[]];
+MrMEME["2e"]["Position"] = UDim2.new(0, 84, 0, 67);
+
+-- StarterGui.ToolTweaks.RotationUtils.Up.UICorner
+MrMEME["2f"] = Instance.new("UICorner", MrMEME["2e"]);
+MrMEME["2f"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.RotationUtils.Up.UIGradient
+MrMEME["30"] = Instance.new("UIGradient", MrMEME["2e"]);
+MrMEME["30"]["Rotation"] = 9;
+MrMEME["30"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 142, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(73, 218, 0))};
+
+-- StarterGui.ToolTweaks.RotationUtils.Up.Title
+MrMEME["31"] = Instance.new("TextLabel", MrMEME["2e"]);
+MrMEME["31"]["TextWrapped"] = true;
+MrMEME["31"]["BorderSizePixel"] = 0;
+MrMEME["31"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["31"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["31"]["TextSize"] = 15;
+MrMEME["31"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["31"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["31"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["31"]["Text"] = [[Up]];
+MrMEME["31"]["Name"] = [[Title]];
+MrMEME["31"]["BackgroundTransparency"] = 1;
+
+-- StarterGui.ToolTweaks.RotationUtils.Up.Title.UIGradient
+MrMEME["32"] = Instance.new("UIGradient", MrMEME["31"]);
+MrMEME["32"]["Rotation"] = 180;
+MrMEME["32"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(56, 255, 0))};
+
+-- StarterGui.ToolTweaks.RotationUtils.Left
+MrMEME["33"] = Instance.new("TextButton", MrMEME["2b"]);
+MrMEME["33"]["BorderSizePixel"] = 0;
+MrMEME["33"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["33"]["TextSize"] = 14;
+MrMEME["33"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["33"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["33"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["33"]["Size"] = UDim2.new(0, 45, 0, 45);
+MrMEME["33"]["Name"] = [[Left]];
+MrMEME["33"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["33"]["Text"] = [[]];
+MrMEME["33"]["Position"] = UDim2.new(0, 35, 0, 116);
+
+-- StarterGui.ToolTweaks.RotationUtils.Left.UICorner
+MrMEME["34"] = Instance.new("UICorner", MrMEME["33"]);
+MrMEME["34"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.RotationUtils.Left.UIGradient
+MrMEME["35"] = Instance.new("UIGradient", MrMEME["33"]);
+MrMEME["35"]["Rotation"] = 9;
+MrMEME["35"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 142, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(73, 218, 0))};
+
+-- StarterGui.ToolTweaks.RotationUtils.Left.Title
+MrMEME["36"] = Instance.new("TextLabel", MrMEME["33"]);
+MrMEME["36"]["TextWrapped"] = true;
+MrMEME["36"]["BorderSizePixel"] = 0;
+MrMEME["36"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["36"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["36"]["TextSize"] = 15;
+MrMEME["36"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["36"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["36"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["36"]["Text"] = [[Left]];
+MrMEME["36"]["Name"] = [[Title]];
+MrMEME["36"]["BackgroundTransparency"] = 1;
+
+-- StarterGui.ToolTweaks.RotationUtils.Left.Title.UIGradient
+MrMEME["37"] = Instance.new("UIGradient", MrMEME["36"]);
+MrMEME["37"]["Rotation"] = 180;
+MrMEME["37"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(56, 255, 0))};
+
+-- StarterGui.ToolTweaks.RotationUtils.Down
+MrMEME["38"] = Instance.new("TextButton", MrMEME["2b"]);
+MrMEME["38"]["BorderSizePixel"] = 0;
+MrMEME["38"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["38"]["TextSize"] = 14;
+MrMEME["38"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["38"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["38"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["38"]["Size"] = UDim2.new(0, 45, 0, 45);
+MrMEME["38"]["Name"] = [[Down]];
+MrMEME["38"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["38"]["Text"] = [[]];
+MrMEME["38"]["Position"] = UDim2.new(0, 84, 0, 165);
+
+-- StarterGui.ToolTweaks.RotationUtils.Down.UICorner
+MrMEME["39"] = Instance.new("UICorner", MrMEME["38"]);
+MrMEME["39"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.RotationUtils.Down.UIGradient
+MrMEME["3a"] = Instance.new("UIGradient", MrMEME["38"]);
+MrMEME["3a"]["Rotation"] = 9;
+MrMEME["3a"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 142, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(73, 218, 0))};
+
+-- StarterGui.ToolTweaks.RotationUtils.Down.Title
+MrMEME["3b"] = Instance.new("TextLabel", MrMEME["38"]);
+MrMEME["3b"]["TextWrapped"] = true;
+MrMEME["3b"]["BorderSizePixel"] = 0;
+MrMEME["3b"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["3b"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["3b"]["TextSize"] = 15;
+MrMEME["3b"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["3b"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["3b"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["3b"]["Text"] = [[Down]];
+MrMEME["3b"]["Name"] = [[Title]];
+MrMEME["3b"]["BackgroundTransparency"] = 1;
+
+-- StarterGui.ToolTweaks.RotationUtils.Down.Title.UIGradient
+MrMEME["3c"] = Instance.new("UIGradient", MrMEME["3b"]);
+MrMEME["3c"]["Rotation"] = 180;
+MrMEME["3c"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(56, 255, 0))};
+
+-- StarterGui.ToolTweaks.RotationUtils.Right
+MrMEME["3d"] = Instance.new("TextButton", MrMEME["2b"]);
+MrMEME["3d"]["BorderSizePixel"] = 0;
+MrMEME["3d"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["3d"]["TextSize"] = 14;
+MrMEME["3d"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["3d"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["3d"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["3d"]["Size"] = UDim2.new(0, 45, 0, 45);
+MrMEME["3d"]["Name"] = [[Right]];
+MrMEME["3d"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["3d"]["Text"] = [[]];
+MrMEME["3d"]["Position"] = UDim2.new(0, 133, 0, 116);
+
+-- StarterGui.ToolTweaks.RotationUtils.Right.UICorner
+MrMEME["3e"] = Instance.new("UICorner", MrMEME["3d"]);
+MrMEME["3e"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.RotationUtils.Right.UIGradient
+MrMEME["3f"] = Instance.new("UIGradient", MrMEME["3d"]);
+MrMEME["3f"]["Rotation"] = 9;
+MrMEME["3f"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 142, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(73, 218, 0))};
+
+-- StarterGui.ToolTweaks.RotationUtils.Right.Title
+MrMEME["40"] = Instance.new("TextLabel", MrMEME["3d"]);
+MrMEME["40"]["TextWrapped"] = true;
+MrMEME["40"]["BorderSizePixel"] = 0;
+MrMEME["40"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["40"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["40"]["TextSize"] = 15;
+MrMEME["40"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["40"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["40"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["40"]["Text"] = [[Right]];
+MrMEME["40"]["Name"] = [[Title]];
+MrMEME["40"]["BackgroundTransparency"] = 1;
+
+-- StarterGui.ToolTweaks.RotationUtils.Right.Title.UIGradient
+MrMEME["41"] = Instance.new("UIGradient", MrMEME["40"]);
+MrMEME["41"]["Rotation"] = 180;
+MrMEME["41"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(56, 255, 0))};
+
+-- StarterGui.ToolTweaks.RotationUtils.Exit
+MrMEME["42"] = Instance.new("TextButton", MrMEME["2b"]);
+MrMEME["42"]["BorderSizePixel"] = 0;
+MrMEME["42"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["42"]["TextSize"] = 14;
+MrMEME["42"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["42"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["42"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["42"]["Size"] = UDim2.new(0, 45, 0, 45);
+MrMEME["42"]["Name"] = [[Exit]];
+MrMEME["42"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["42"]["Text"] = [[]];
+MrMEME["42"]["Position"] = UDim2.new(0, 84, 0, 116);
+
+-- StarterGui.ToolTweaks.RotationUtils.Exit.UICorner
+MrMEME["43"] = Instance.new("UICorner", MrMEME["42"]);
+MrMEME["43"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.RotationUtils.Exit.UIGradient
+MrMEME["44"] = Instance.new("UIGradient", MrMEME["42"]);
+MrMEME["44"]["Rotation"] = 9;
+MrMEME["44"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 87, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(50, 148, 0))};
+
+-- StarterGui.ToolTweaks.RotationUtils.Exit.Title
+MrMEME["45"] = Instance.new("TextLabel", MrMEME["42"]);
+MrMEME["45"]["TextWrapped"] = true;
+MrMEME["45"]["BorderSizePixel"] = 0;
+MrMEME["45"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["45"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["45"]["TextSize"] = 15;
+MrMEME["45"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["45"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["45"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["45"]["Text"] = [[Exit]];
+MrMEME["45"]["Name"] = [[Title]];
+MrMEME["45"]["BackgroundTransparency"] = 1;
+
+-- StarterGui.ToolTweaks.RotationUtils.Exit.Title.UIGradient
+MrMEME["46"] = Instance.new("UIGradient", MrMEME["45"]);
+MrMEME["46"]["Rotation"] = 180;
+MrMEME["46"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(56, 255, 0))};
+
+-- StarterGui.ToolTweaks.RotationUtils.
+MrMEME["47"] = Instance.new("Frame", MrMEME["2b"]);
+MrMEME["47"]["BorderSizePixel"] = 0;
+MrMEME["47"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["47"]["AnchorPoint"] = Vector2.new(0.5, 0);
+MrMEME["47"]["Size"] = UDim2.new(0, 151, 0, 2);
+MrMEME["47"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["47"]["Position"] = UDim2.new(0.5, 0, 0, 33);
+MrMEME["47"]["Name"] = [[]];
+
+-- StarterGui.ToolTweaks.RotationUtils..UIGradient
+MrMEME["48"] = Instance.new("UIGradient", MrMEME["47"]);
+MrMEME["48"]["Rotation"] = 180;
+MrMEME["48"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(98, 98, 98)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(35, 107, 0))};
+
+-- StarterGui.ToolTweaks.RotationUtils.Title
+MrMEME["49"] = Instance.new("TextLabel", MrMEME["2b"]);
+MrMEME["49"]["TextWrapped"] = true;
+MrMEME["49"]["BorderSizePixel"] = 0;
+MrMEME["49"]["TextScaled"] = true;
+MrMEME["49"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["49"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["49"]["TextSize"] = 22;
+MrMEME["49"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["49"]["AnchorPoint"] = Vector2.new(0.5, 0);
+MrMEME["49"]["Size"] = UDim2.new(0, 185, 0, 23);
+MrMEME["49"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["49"]["Text"] = [[Rotation (Buttons)]];
+MrMEME["49"]["Name"] = [[Title]];
+MrMEME["49"]["BackgroundTransparency"] = 1;
+MrMEME["49"]["Position"] = UDim2.new(0.5, 0, 0, 7);
+
+-- StarterGui.ToolTweaks.RotationUtils.Title.UIGradient
+MrMEME["4a"] = Instance.new("UIGradient", MrMEME["49"]);
+MrMEME["4a"]["Rotation"] = 180;
+MrMEME["4a"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(46, 210, 0))};
+
+-- StarterGui.ToolTweaks.RotationUtils.Input
+MrMEME["4b"] = Instance.new("Frame", MrMEME["2b"]);
+MrMEME["4b"]["Active"] = true;
+MrMEME["4b"]["BorderSizePixel"] = 0;
+MrMEME["4b"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["4b"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["4b"]["Size"] = UDim2.new(0, 30, 0, 30);
+MrMEME["4b"]["Selectable"] = true;
+MrMEME["4b"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["4b"]["Position"] = UDim2.new(0, 27, 0, 172);
+MrMEME["4b"]["Name"] = [[Input]];
+
+-- StarterGui.ToolTweaks.RotationUtils.Input.UICorner
+MrMEME["4c"] = Instance.new("UICorner", MrMEME["4b"]);
+MrMEME["4c"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.RotationUtils.Input.TextBox
+MrMEME["4d"] = Instance.new("TextBox", MrMEME["4b"]);
+MrMEME["4d"]["CursorPosition"] = -1;
+MrMEME["4d"]["BorderSizePixel"] = 0;
+MrMEME["4d"]["TextSize"] = 19;
+MrMEME["4d"]["TextWrapped"] = true;
+MrMEME["4d"]["TextScaled"] = true;
+MrMEME["4d"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["4d"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["4d"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["4d"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["4d"]["BackgroundTransparency"] = 1;
+MrMEME["4d"]["Size"] = UDim2.new(0.8500000238418579, 0, 0.8500000238418579, 0);
+MrMEME["4d"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["4d"]["Text"] = [[0.5]];
+MrMEME["4d"]["Position"] = UDim2.new(0.5, 0, 0.5, 0);
+
+-- StarterGui.ToolTweaks.RotationUtils.Input.UIGradient
+MrMEME["4e"] = Instance.new("UIGradient", MrMEME["4b"]);
+MrMEME["4e"]["Rotation"] = 9;
+MrMEME["4e"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 87, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(50, 148, 0))};
+
+-- StarterGui.ToolTweaks.RotationUtils.TRight
+MrMEME["4f"] = Instance.new("TextButton", MrMEME["2b"]);
+MrMEME["4f"]["BorderSizePixel"] = 0;
+MrMEME["4f"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["4f"]["TextSize"] = 14;
+MrMEME["4f"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["4f"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["4f"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["4f"]["Size"] = UDim2.new(0, 45, 0, 45);
+MrMEME["4f"]["Name"] = [[TRight]];
+MrMEME["4f"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["4f"]["Text"] = [[]];
+MrMEME["4f"]["Position"] = UDim2.new(0, 133, 0, 67);
+
+-- StarterGui.ToolTweaks.RotationUtils.TRight.UICorner
+MrMEME["50"] = Instance.new("UICorner", MrMEME["4f"]);
+MrMEME["50"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.RotationUtils.TRight.UIGradient
+MrMEME["51"] = Instance.new("UIGradient", MrMEME["4f"]);
+MrMEME["51"]["Rotation"] = 9;
+MrMEME["51"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 142, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(73, 218, 0))};
+
+-- StarterGui.ToolTweaks.RotationUtils.TRight.Title
+MrMEME["52"] = Instance.new("TextLabel", MrMEME["4f"]);
+MrMEME["52"]["TextWrapped"] = true;
+MrMEME["52"]["BorderSizePixel"] = 0;
+MrMEME["52"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["52"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["52"]["TextSize"] = 15;
+MrMEME["52"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["52"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["52"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["52"]["Text"] = [[Tilt
+Right]];
+MrMEME["52"]["Name"] = [[Title]];
+MrMEME["52"]["BackgroundTransparency"] = 1;
+
+-- StarterGui.ToolTweaks.RotationUtils.TRight.Title.UIGradient
+MrMEME["53"] = Instance.new("UIGradient", MrMEME["52"]);
+MrMEME["53"]["Rotation"] = 180;
+MrMEME["53"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(56, 255, 0))};
+
+-- StarterGui.ToolTweaks.RotationUtils.TLeft
+MrMEME["54"] = Instance.new("TextButton", MrMEME["2b"]);
+MrMEME["54"]["BorderSizePixel"] = 0;
+MrMEME["54"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["54"]["TextSize"] = 14;
+MrMEME["54"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["54"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["54"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["54"]["Size"] = UDim2.new(0, 45, 0, 45);
+MrMEME["54"]["Name"] = [[TLeft]];
+MrMEME["54"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["54"]["Text"] = [[]];
+MrMEME["54"]["Position"] = UDim2.new(0, 35, 0, 67);
+
+-- StarterGui.ToolTweaks.RotationUtils.TLeft.UICorner
+MrMEME["55"] = Instance.new("UICorner", MrMEME["54"]);
+MrMEME["55"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.RotationUtils.TLeft.UIGradient
+MrMEME["56"] = Instance.new("UIGradient", MrMEME["54"]);
+MrMEME["56"]["Rotation"] = 9;
+MrMEME["56"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 142, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(73, 218, 0))};
+
+-- StarterGui.ToolTweaks.RotationUtils.TLeft.Title
+MrMEME["57"] = Instance.new("TextLabel", MrMEME["54"]);
+MrMEME["57"]["TextWrapped"] = true;
+MrMEME["57"]["BorderSizePixel"] = 0;
+MrMEME["57"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["57"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["57"]["TextSize"] = 15;
+MrMEME["57"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["57"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["57"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["57"]["Text"] = [[Tilt
+Left]];
+MrMEME["57"]["Name"] = [[Title]];
+MrMEME["57"]["BackgroundTransparency"] = 1;
+
+-- StarterGui.ToolTweaks.RotationUtils.TLeft.Title.UIGradient
+MrMEME["58"] = Instance.new("UIGradient", MrMEME["57"]);
+MrMEME["58"]["Rotation"] = 180;
+MrMEME["58"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(56, 255, 0))};
+
+-- StarterGui.ToolTweaks.RotationUtils.RotUtilHandler
+MrMEME["59"] = Instance.new("LocalScript", MrMEME["2b"]);
+MrMEME["59"]["Name"] = [[RotUtilHandler]];
+
+-- StarterGui.ToolTweaks.RotationUtils.DropShadowHolder
+MrMEME["5a"] = Instance.new("Frame", MrMEME["2b"]);
+MrMEME["5a"]["ZIndex"] = 0;
+MrMEME["5a"]["BorderSizePixel"] = 0;
+MrMEME["5a"]["BackgroundTransparency"] = 1;
+MrMEME["5a"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["5a"]["Name"] = [[DropShadowHolder]];
+
+-- StarterGui.ToolTweaks.RotationUtils.DropShadowHolder.DropShadow
+MrMEME["5b"] = Instance.new("ImageLabel", MrMEME["5a"]);
+MrMEME["5b"]["ZIndex"] = 0;
+MrMEME["5b"]["BorderSizePixel"] = 0;
+MrMEME["5b"]["SliceCenter"] = Rect.new(49, 49, 450, 450);
+MrMEME["5b"]["ScaleType"] = Enum.ScaleType.Slice;
+MrMEME["5b"]["ImageColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["5b"]["ImageTransparency"] = 0.5;
+MrMEME["5b"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["5b"]["Image"] = [[rbxassetid://6014261993]];
+MrMEME["5b"]["Size"] = UDim2.new(1, 47, 1, 47);
+MrMEME["5b"]["Name"] = [[DropShadow]];
+MrMEME["5b"]["BackgroundTransparency"] = 1;
+MrMEME["5b"]["Position"] = UDim2.new(0.5, 0, 0.5, 0);
+
+-- StarterGui.ToolTweaks.PositionUtils (Existing position utility frame)
+MrMEME["5c"] = Instance.new("Frame", MrMEME["1"]);
+MrMEME["5c"]["BorderSizePixel"] = 0;
+MrMEME["5c"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["5c"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["5c"]["Size"] = UDim2.new(0, 169, 0, 200);
+MrMEME["5c"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["5c"]["Position"] = UDim2.new(0.5, 0, 0.5, 0);
+MrMEME["5c"]["Visible"] = false;
+MrMEME["5c"]["Name"] = [[PositionUtils]];
+
+-- StarterGui.ToolTweaks.PositionUtils.UICorner
+MrMEME["5d"] = Instance.new("UICorner", MrMEME["5c"]);
+
+
+-- StarterGui.ToolTweaks.PositionUtils.UIGradient
+MrMEME["5e"] = Instance.new("UIGradient", MrMEME["5c"]);
+MrMEME["5e"]["Rotation"] = 35;
+MrMEME["5e"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(28, 28, 28)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(29, 86, 0))};
+
+-- StarterGui.ToolTweaks.PositionUtils.Up
+MrMEME["5f"] = Instance.new("TextButton", MrMEME["5c"]);
+MrMEME["5f"]["BorderSizePixel"] = 0;
+MrMEME["5f"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["5f"]["TextSize"] = 14;
+MrMEME["5f"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["5f"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["5f"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["5f"]["Size"] = UDim2.new(0, 45, 0, 45);
+MrMEME["5f"]["Name"] = [[Up]];
+MrMEME["5f"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["5f"]["Text"] = [[]];
+MrMEME["5f"]["Position"] = UDim2.new(0, 84, 0, 67);
+
+-- StarterGui.ToolTweaks.PositionUtils.Up.UICorner
+MrMEME["60"] = Instance.new("UICorner", MrMEME["5f"]);
+MrMEME["60"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.PositionUtils.Up.UIGradient
+MrMEME["61"] = Instance.new("UIGradient", MrMEME["5f"]);
+MrMEME["61"]["Rotation"] = 9;
+MrMEME["61"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 142, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(73, 218, 0))};
+
+-- StarterGui.ToolTweaks.PositionUtils.Up.Title
+MrMEME["62"] = Instance.new("TextLabel", MrMEME["5f"]);
+MrMEME["62"]["TextWrapped"] = true;
+MrMEME["62"]["BorderSizePixel"] = 0;
+MrMEME["62"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["62"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["62"]["TextSize"] = 15;
+MrMEME["62"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["62"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["62"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["62"]["Text"] = [[Up]];
+MrMEME["62"]["Name"] = [[Title]];
+MrMEME["62"]["BackgroundTransparency"] = 1;
+
+-- StarterGui.ToolTweaks.PositionUtils.Up.Title.UIGradient
+MrMEME["63"] = Instance.new("UIGradient", MrMEME["62"]);
+MrMEME["63"]["Rotation"] = 180;
+MrMEME["63"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(56, 255, 0))};
+
+-- StarterGui.ToolTweaks.PositionUtils.Left
+MrMEME["64"] = Instance.new("TextButton", MrMEME["5c"]);
+MrMEME["64"]["BorderSizePixel"] = 0;
+MrMEME["64"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["64"]["TextSize"] = 14;
+MrMEME["64"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["64"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["64"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["64"]["Size"] = UDim2.new(0, 45, 0, 45);
+MrMEME["64"]["Name"] = [[Left]];
+MrMEME["64"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["64"]["Text"] = [[]];
+MrMEME["64"]["Position"] = UDim2.new(0, 35, 0, 116);
+
+-- StarterGui.ToolTweaks.PositionUtils.Left.UICorner
+MrMEME["65"] = Instance.new("UICorner", MrMEME["64"]);
+MrMEME["65"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.PositionUtils.Left.UIGradient
+MrMEME["66"] = Instance.new("UIGradient", MrMEME["64"]);
+MrMEME["66"]["Rotation"] = 9;
+MrMEME["66"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 142, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(73, 218, 0))};
+
+-- StarterGui.ToolTweaks.PositionUtils.Left.Title
+MrMEME["67"] = Instance.new("TextLabel", MrMEME["64"]);
+MrMEME["67"]["TextWrapped"] = true;
+MrMEME["67"]["BorderSizePixel"] = 0;
+MrMEME["67"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["67"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["67"]["TextSize"] = 15;
+MrMEME["67"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["67"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["67"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["67"]["Text"] = [[Left]];
+MrMEME["67"]["Name"] = [[Title]];
+MrMEME["67"]["BackgroundTransparency"] = 1;
+
+-- StarterGui.ToolTweaks.PositionUtils.Left.Title.UIGradient
+MrMEME["68"] = Instance.new("UIGradient", MrMEME["67"]);
+MrMEME["68"]["Rotation"] = 180;
+MrMEME["68"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(56, 255, 0))};
+
+-- StarterGui.ToolTweaks.PositionUtils.Down
+MrMEME["69"] = Instance.new("TextButton", MrMEME["5c"]);
+MrMEME["69"]["BorderSizePixel"] = 0;
+MrMEME["69"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["69"]["TextSize"] = 14;
+MrMEME["69"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["69"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["69"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["69"]["Size"] = UDim2.new(0, 45, 0, 45);
+MrMEME["69"]["Name"] = [[Down]];
+MrMEME["69"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["69"]["Text"] = [[]];
+MrMEME["69"]["Position"] = UDim2.new(0, 84, 0, 165);
+
+-- StarterGui.ToolTweaks.PositionUtils.Down.UICorner
+MrMEME["6a"] = Instance.new("UICorner", MrMEME["69"]);
+MrMEME["6a"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.PositionUtils.Down.UIGradient
+MrMEME["6b"] = Instance.new("UIGradient", MrMEME["69"]);
+MrMEME["6b"]["Rotation"] = 9;
+MrMEME["6b"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 142, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(73, 218, 0))};
+
+-- StarterGui.ToolTweaks.PositionUtils.Down.Title
+MrMEME["6c"] = Instance.new("TextLabel", MrMEME["69"]);
+MrMEME["6c"]["TextWrapped"] = true;
+MrMEME["6c"]["BorderSizePixel"] = 0;
+MrMEME["6c"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["6c"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["6c"]["TextSize"] = 15;
+MrMEME["6c"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["6c"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["6c"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["6c"]["Text"] = [[Down]];
+MrMEME["6c"]["Name"] = [[Title]];
+MrMEME["6c"]["BackgroundTransparency"] = 1;
+
+-- StarterGui.ToolTweaks.PositionUtils.Down.Title.UIGradient
+MrMEME["6d"] = Instance.new("UIGradient", MrMEME["6c"]);
+MrMEME["6d"]["Rotation"] = 180;
+MrMEME["6d"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(56, 255, 0))};
+
+-- StarterGui.ToolTweaks.PositionUtils.Right
+MrMEME["6e"] = Instance.new("TextButton", MrMEME["5c"]);
+MrMEME["6e"]["BorderSizePixel"] = 0;
+MrMEME["6e"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["6e"]["TextSize"] = 14;
+MrMEME["6e"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["6e"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["6e"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["6e"]["Size"] = UDim2.new(0, 45, 0, 45);
+MrMEME["6e"]["Name"] = [[Right]];
+MrMEME["6e"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["6e"]["Text"] = [[]];
+MrMEME["6e"]["Position"] = UDim2.new(0, 133, 0, 116);
+
+-- StarterGui.ToolTweaks.PositionUtils.Right.UICorner
+MrMEME["6f"] = Instance.new("UICorner", MrMEME["6e"]);
+MrMEME["6f"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.PositionUtils.Right.UIGradient
+MrMEME["70"] = Instance.new("UIGradient", MrMEME["6e"]);
+MrMEME["70"]["Rotation"] = 9;
+MrMEME["70"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 142, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(73, 218, 0))};
+
+-- StarterGui.ToolTweaks.PositionUtils.Right.Title
+MrMEME["71"] = Instance.new("TextLabel", MrMEME["6e"]);
+MrMEME["71"]["TextWrapped"] = true;
+MrMEME["71"]["BorderSizePixel"] = 0;
+MrMEME["71"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["71"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["71"]["TextSize"] = 15;
+MrMEME["71"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["71"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["71"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["71"]["Text"] = [[Right]];
+MrMEME["71"]["Name"] = [[Title]];
+MrMEME["71"]["BackgroundTransparency"] = 1;
+
+-- StarterGui.ToolTweaks.PositionUtils.Right.Title.UIGradient
+MrMEME["72"] = Instance.new("UIGradient", MrMEME["71"]);
+MrMEME["72"]["Rotation"] = 180;
+MrMEME["72"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(56, 255, 0))};
+
+-- StarterGui.ToolTweaks.PositionUtils.Exit
+MrMEME["73"] = Instance.new("TextButton", MrMEME["5c"]);
+MrMEME["73"]["BorderSizePixel"] = 0;
+MrMEME["73"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["73"]["TextSize"] = 14;
+MrMEME["73"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["73"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["73"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["73"]["Size"] = UDim2.new(0, 45, 0, 45);
+MrMEME["73"]["Name"] = [[Exit]];
+MrMEME["73"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["73"]["Text"] = [[]];
+MrMEME["73"]["Position"] = UDim2.new(0, 84, 0, 116);
+
+-- StarterGui.ToolTweaks.PositionUtils.Exit.UICorner
+MrMEME["74"] = Instance.new("UICorner", MrMEME["73"]);
+MrMEME["74"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.PositionUtils.Exit.UIGradient
+MrMEME["75"] = Instance.new("UIGradient", MrMEME["73"]);
+MrMEME["75"]["Rotation"] = 9;
+MrMEME["75"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 87, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(50, 148, 0))};
+
+-- StarterGui.ToolTweaks.PositionUtils.Exit.Title
+MrMEME["76"] = Instance.new("TextLabel", MrMEME["73"]);
+MrMEME["76"]["TextWrapped"] = true;
+MrMEME["76"]["BorderSizePixel"] = 0;
+MrMEME["76"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["76"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["76"]["TextSize"] = 15;
+MrMEME["76"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["76"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["76"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["76"]["Text"] = [[Exit]];
+MrMEME["76"]["Name"] = [[Title]];
+MrMEME["76"]["BackgroundTransparency"] = 1;
+
+-- StarterGui.ToolTweaks.PositionUtils.Exit.Title.UIGradient
+MrMEME["77"] = Instance.new("UIGradient", MrMEME["76"]);
+MrMEME["77"]["Rotation"] = 180;
+MrMEME["77"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(56, 255, 0))};
+
+-- StarterGui.ToolTweaks.PositionUtils.
+MrMEME["78"] = Instance.new("Frame", MrMEME["5c"]);
+MrMEME["78"]["BorderSizePixel"] = 0;
+MrMEME["78"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["78"]["AnchorPoint"] = Vector2.new(0.5, 0);
+MrMEME["78"]["Size"] = UDim2.new(0, 151, 0, 2);
+MrMEME["78"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["78"]["Position"] = UDim2.new(0.5, 0, 0, 33);
+MrMEME["78"]["Name"] = [[]];
+
+-- StarterGui.ToolTweaks.PositionUtils..UIGradient
+MrMEME["79"] = Instance.new("UIGradient", MrMEME["78"]);
+MrMEME["79"]["Rotation"] = 180;
+MrMEME["79"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(98, 98, 98)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(35, 107, 0))};
+
+-- StarterGui.ToolTweaks.PositionUtils.Title
+MrMEME["7a"] = Instance.new("TextLabel", MrMEME["5c"]);
+MrMEME["7a"]["TextWrapped"] = true;
+MrMEME["7a"]["BorderSizePixel"] = 0;
+MrMEME["7a"]["TextScaled"] = true;
+MrMEME["7a"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["7a"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["7a"]["TextSize"] = 22;
+MrMEME["7a"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["7a"]["AnchorPoint"] = Vector2.new(0.5, 0);
+MrMEME["7a"]["Size"] = UDim2.new(0, 185, 0, 23);
+MrMEME["7a"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["7a"]["Text"] = [[Position (Buttons)]];
+MrMEME["7a"]["Name"] = [[Title]];
+MrMEME["7a"]["BackgroundTransparency"] = 1;
+MrMEME["7a"]["Position"] = UDim2.new(0.5, 0, 0, 7);
+
+-- StarterGui.ToolTweaks.PositionUtils.Title.UIGradient
+MrMEME["7b"] = Instance.new("UIGradient", MrMEME["7a"]);
+MrMEME["7b"]["Rotation"] = 180;
+MrMEME["7b"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(46, 210, 0))};
+
+-- StarterGui.ToolTweaks.PositionUtils.Input
+MrMEME["7c"] = Instance.new("Frame", MrMEME["5c"]);
+MrMEME["7c"]["Active"] = true;
+MrMEME["7c"]["BorderSizePixel"] = 0;
+MrMEME["7c"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["7c"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["7c"]["Size"] = UDim2.new(0, 30, 0, 30);
+MrMEME["7c"]["Selectable"] = true;
+MrMEME["7c"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["7c"]["Position"] = UDim2.new(0, 27, 0, 172);
+MrMEME["7c"]["Name"] = [[Input]];
+
+-- StarterGui.ToolTweaks.PositionUtils.Input.UICorner
+MrMEME["7d"] = Instance.new("UICorner", MrMEME["7c"]);
+MrMEME["7d"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.PositionUtils.Input.TextBox
+MrMEME["7e"] = Instance.new("TextBox", MrMEME["7c"]);
+MrMEME["7e"]["BorderSizePixel"] = 0;
+MrMEME["7e"]["TextSize"] = 19;
+MrMEME["7e"]["TextWrapped"] = true;
+MrMEME["7e"]["TextScaled"] = true;
+MrMEME["7e"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["7e"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["7e"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["7e"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["7e"]["BackgroundTransparency"] = 1;
+MrMEME["7e"]["Size"] = UDim2.new(0.8500000238418579, 0, 0.8500000238418579, 0);
+MrMEME["7e"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["7e"]["Text"] = [[0.5]];
+MrMEME["7e"]["Position"] = UDim2.new(0.5, 0, 0.5, 0);
+
+-- StarterGui.ToolTweaks.PositionUtils.Input.UIGradient
+MrMEME["7f"] = Instance.new("UIGradient", MrMEME["7c"]);
+MrMEME["7f"]["Rotation"] = 9;
+MrMEME["7f"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 87, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(50, 148, 0))};
+
+-- StarterGui.ToolTweaks.PositionUtils.Back
+MrMEME["80"] = Instance.new("TextButton", MrMEME["5c"]);
+MrMEME["80"]["BorderSizePixel"] = 0;
+MrMEME["80"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["80"]["TextSize"] = 14;
+MrMEME["80"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["80"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["80"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["80"]["Size"] = UDim2.new(0, 45, 0, 45);
+MrMEME["80"]["Name"] = [[Back]];
+MrMEME["80"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["80"]["Text"] = [[]];
+MrMEME["80"]["Position"] = UDim2.new(0, 133, 0, 67);
+
+-- StarterGui.ToolTweaks.PositionUtils.Back.UICorner
+MrMEME["81"] = Instance.new("UICorner", MrMEME["80"]);
+MrMEME["81"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.PositionUtils.Back.UIGradient
+MrMEME["82"] = Instance.new("UIGradient", MrMEME["80"]);
+MrMEME["82"]["Rotation"] = 9;
+MrMEME["82"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 142, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(73, 218, 0))};
+
+-- StarterGui.ToolTweaks.PositionUtils.Back.Title
+MrMEME["83"] = Instance.new("TextLabel", MrMEME["80"]);
+MrMEME["83"]["TextWrapped"] = true;
+MrMEME["83"]["BorderSizePixel"] = 0;
+MrMEME["83"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["83"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["83"]["TextSize"] = 15;
+MrMEME["83"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["83"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["83"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["83"]["Text"] = [[Back]];
+MrMEME["83"]["Name"] = [[Title]];
+MrMEME["83"]["BackgroundTransparency"] = 1;
+
+-- StarterGui.ToolTweaks.PositionUtils.Back.Title.UIGradient
+MrMEME["84"] = Instance.new("UIGradient", MrMEME["83"]);
+MrMEME["84"]["Rotation"] = 180;
+MrMEME["84"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(56, 255, 0))};
+
+-- StarterGui.ToolTweaks.PositionUtils.Front
+MrMEME["85"] = Instance.new("TextButton", MrMEME["5c"]);
+MrMEME["85"]["BorderSizePixel"] = 0;
+MrMEME["85"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["85"]["TextSize"] = 14;
+MrMEME["85"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["85"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["85"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["85"]["Size"] = UDim2.new(0, 45, 0, 45);
+MrMEME["85"]["Name"] = [[Front]];
+MrMEME["85"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["85"]["Text"] = [[]];
+MrMEME["85"]["Position"] = UDim2.new(0, 35, 0, 67);
+
+-- StarterGui.ToolTweaks.PositionUtils.Front.UICorner
+MrMEME["86"] = Instance.new("UICorner", MrMEME["85"]);
+MrMEME["86"]["CornerRadius"] = UDim.new(0, 5);
+
+-- StarterGui.ToolTweaks.PositionUtils.Front.UIGradient
+MrMEME["87"] = Instance.new("UIGradient", MrMEME["85"]);
+MrMEME["87"]["Rotation"] = 9;
+MrMEME["87"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 142, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(73, 218, 0))};
+
+-- StarterGui.ToolTweaks.PositionUtils.Front.Title
+MrMEME["88"] = Instance.new("TextLabel", MrMEME["85"]);
+MrMEME["88"]["TextWrapped"] = true;
+MrMEME["88"]["BorderSizePixel"] = 0;
+MrMEME["88"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["88"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["88"]["TextSize"] = 15;
+MrMEME["88"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["88"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["88"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["88"]["Text"] = [[Front]];
+MrMEME["88"]["Name"] = [[Title]];
+MrMEME["88"]["BackgroundTransparency"] = 1;
+
+-- StarterGui.ToolTweaks.PositionUtils.Front.Title.UIGradient
+MrMEME["89"] = Instance.new("UIGradient", MrMEME["88"]);
+MrMEME["89"]["Rotation"] = 180;
+MrMEME["89"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(56, 255, 0))};
+
+-- StarterGui.ToolTweaks.PositionUtils.PosUtilHandler
+MrMEME["8a"] = Instance.new("LocalScript", MrMEME["5c"]);
+MrMEME["8a"]["Name"] = [[PosUtilHandler]];
+
+-- StarterGui.ToolTweaks.PositionUtils.DropShadowHolder
+MrMEME["8b"] = Instance.new("Frame", MrMEME["5c"]);
+MrMEME["8b"]["ZIndex"] = 0;
+MrMEME["8b"]["BorderSizePixel"] = 0;
+MrMEME["8b"]["BackgroundTransparency"] = 1;
+MrMEME["8b"]["Size"] = UDim2.new(1, 0, 1, 0);
+MrMEME["8b"]["Name"] = [[DropShadowHolder]];
+
+-- StarterGui.ToolTweaks.PositionUtils.DropShadowHolder.DropShadow
+MrMEME["8c"] = Instance.new("ImageLabel", MrMEME["8b"]);
+MrMEME["8c"]["ZIndex"] = 0;
+MrMEME["8c"]["BorderSizePixel"] = 0;
+MrMEME["8c"]["SliceCenter"] = Rect.new(49, 49, 450, 450);
+MrMEME["8c"]["ScaleType"] = Enum.ScaleType.Slice;
+MrMEME["8c"]["ImageColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["8c"]["ImageTransparency"] = 0.5;
+MrMEME["8c"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["8c"]["Image"] = [[rbxassetid://6014261993]];
+MrMEME["8c"]["Size"] = UDim2.new(1, 47, 1, 47);
+MrMEME["8c"]["Name"] = [[DropShadow]];
+MrMEME["8c"]["BackgroundTransparency"] = 1;
+MrMEME["8c"]["Position"] = UDim2.new(0.5, 0, 0.5, 0);
+
+-- StarterGui.ToolTweaks.CenterModule
+MrMEME["8d"] = Instance.new("ModuleScript", MrMEME["1"]);
+MrMEME["8d"]["Name"] = [[CenterModule]];
+
+-- StarterGui.ToolTweaks.NOT MADE BY MRMEME
+MrMEME["8e"] = Instance.new("StringValue", MrMEME["1"]);
+MrMEME["8e"]["Value"] = [[MrMeme]];
+MrMEME["8e"]["Name"] = [[NOT MADE BY MRMEME]];
+
+-- New UI elements for Rotation Slider
+MrMEME["RotationSlider"] = Instance.new("Frame", MrMEME["1"]);
+MrMEME["RotationSlider"]["Name"] = [[RotationSlider]];
+MrMEME["RotationSlider"]["BorderSizePixel"] = 0;
+MrMEME["RotationSlider"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["RotationSlider"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["RotationSlider"]["Size"] = UDim2.new(0, 250, 0, 150);
+MrMEME["RotationSlider"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["RotationSlider"]["Position"] = UDim2.new(0.5, 0, 0.5, 0);
+MrMEME["RotationSlider"]["Visible"] = false; -- Initially hidden
+
+MrMEME["RotationSlider_UICorner"] = Instance.new("UICorner", MrMEME["RotationSlider"]);
+MrMEME["RotationSlider_UICorner"]["CornerRadius"] = UDim.new(0, 5);
+
+MrMEME["RotationSlider_UIGradient"] = Instance.new("UIGradient", MrMEME["RotationSlider"]);
+MrMEME["RotationSlider_UIGradient"]["Rotation"] = 35;
+MrMEME["RotationSlider_UIGradient"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(28, 28, 28)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(29, 86, 0))};
+
+MrMEME["RotationSlider_Title"] = Instance.new("TextLabel", MrMEME["RotationSlider"]);
+MrMEME["RotationSlider_Title"]["TextWrapped"] = true;
+MrMEME["RotationSlider_Title"]["BorderSizePixel"] = 0;
+MrMEME["RotationSlider_Title"]["TextScaled"] = true;
+MrMEME["RotationSlider_Title"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["RotationSlider_Title"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["RotationSlider_Title"]["TextSize"] = 22;
+MrMEME["RotationSlider_Title"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["RotationSlider_Title"]["AnchorPoint"] = Vector2.new(0.5, 0);
+MrMEME["RotationSlider_Title"]["Size"] = UDim2.new(0, 200, 0, 23);
+MrMEME["RotationSlider_Title"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["RotationSlider_Title"]["Text"] = [[Rotation Slider]];
+MrMEME["RotationSlider_Title"]["Name"] = [[Title]];
+MrMEME["RotationSlider_Title"]["BackgroundTransparency"] = 1;
+MrMEME["RotationSlider_Title"]["Position"] = UDim2.new(0.5, 0, 0, 7);
+
+MrMEME["RotationSlider_Title_UIGradient"] = Instance.new("UIGradient", MrMEME["RotationSlider_Title"]);
+MrMEME["RotationSlider_Title_UIGradient"]["Rotation"] = 180;
+MrMEME["RotationSlider_Title_UIGradient"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(46, 210, 0))};
+
+MrMEME["RotationSlider_Exit"] = Instance.new("TextButton", MrMEME["RotationSlider"]);
+MrMEME["RotationSlider_Exit"]["BorderSizePixel"] = 0;
+MrMEME["RotationSlider_Exit"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["RotationSlider_Exit"]["TextSize"] = 14;
+MrMEME["RotationSlider_Exit"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["RotationSlider_Exit"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["RotationSlider_Exit"]["AnchorPoint"] = Vector2.new(1, 0);
+MrMEME["RotationSlider_Exit"]["Size"] = UDim2.new(0, 30, 0, 20);
+MrMEME["RotationSlider_Exit"]["Name"] = [[Exit]];
+MrMEME["RotationSlider_Exit"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["RotationSlider_Exit"]["Text"] = [[X]];
+MrMEME["RotationSlider_Exit"]["Position"] = UDim2.new(1, -5, 0, 5);
+MrMEME["RotationSlider_Exit"]["BackgroundTransparency"] = 0.5;
+
+MrMEME["RotationSlider_Exit_UICorner"] = Instance.new("UICorner", MrMEME["RotationSlider_Exit"]);
+MrMEME["RotationSlider_Exit_UICorner"]["CornerRadius"] = UDim.new(0, 5);
+
+MrMEME["RotationSlider_Exit_UIGradient"] = Instance.new("UIGradient", MrMEME["RotationSlider_Exit"]);
+MrMEME["RotationSlider_Exit_UIGradient"]["Rotation"] = 9;
+MrMEME["RotationSlider_Exit_UIGradient"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(200, 0, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(255, 50, 50))};
+
+
+MrMEME["RotationSlider_SliderTrack"] = Instance.new("Frame", MrMEME["RotationSlider"]);
+MrMEME["RotationSlider_SliderTrack"]["Name"] = [[SliderTrack]];
+MrMEME["RotationSlider_SliderTrack"]["BorderSizePixel"] = 0;
+MrMEME["RotationSlider_SliderTrack"]["BackgroundColor3"] = Color3.fromRGB(50, 50, 50);
+MrMEME["RotationSlider_SliderTrack"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["RotationSlider_SliderTrack"]["Size"] = UDim2.new(0, 200, 0, 10);
+MrMEME["RotationSlider_SliderTrack"]["Position"] = UDim2.new(0.5, 0, 0.5, 0);
+
+MrMEME["RotationSlider_SliderTrack_UICorner"] = Instance.new("UICorner", MrMEME["RotationSlider_SliderTrack"]);
+MrMEME["RotationSlider_SliderTrack_UICorner"]["CornerRadius"] = UDim.new(0, 5);
+
+MrMEME["RotationSlider_SliderThumb"] = Instance.new("TextButton", MrMEME["RotationSlider_SliderTrack"]);
+MrMEME["RotationSlider_SliderThumb"]["Name"] = [[SliderThumb]];
+MrMEME["RotationSlider_SliderThumb"]["BorderSizePixel"] = 0;
+MrMEME["RotationSlider_SliderThumb"]["BackgroundColor3"] = Color3.fromRGB(0, 142, 0);
+MrMEME["RotationSlider_SliderThumb"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["RotationSlider_SliderThumb"]["Size"] = UDim2.new(0, 20, 0, 20);
+MrMEME["RotationSlider_SliderThumb"]["Position"] = UDim2.new(0.5, 0, 0.5, 0); -- Start in middle
+MrMEME["RotationSlider_SliderThumb"]["Text"] = [[]];
+MrMEME["RotationSlider_SliderThumb"]["Active"] = true;
+MrMEME["RotationSlider_SliderThumb"]["Selectable"] = true;
+
+MrMEME["RotationSlider_SliderThumb_UICorner"] = Instance.new("UICorner", MrMEME["RotationSlider_SliderThumb"]);
+MrMEME["RotationSlider_SliderThumb_UICorner"]["CornerRadius"] = UDim.new(0, 10);
+
+MrMEME["RotationSlider_SliderThumb_UIGradient"] = Instance.new("UIGradient", MrMEME["RotationSlider_SliderThumb"]);
+MrMEME["RotationSlider_SliderThumb_UIGradient"]["Rotation"] = 9;
+MrMEME["RotationSlider_SliderThumb_UIGradient"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 142, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(73, 218, 0))};
+
+MrMEME["RotationSlider_SliderValue"] = Instance.new("TextLabel", MrMEME["RotationSlider"]);
+MrMEME["RotationSlider_SliderValue"]["Name"] = [[SliderValue]];
+MrMEME["RotationSlider_SliderValue"]["TextWrapped"] = true;
+MrMEME["RotationSlider_SliderValue"]["BorderSizePixel"] = 0;
+MrMEME["RotationSlider_SliderValue"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["RotationSlider_SliderValue"]["BackgroundTransparency"] = 1;
+MrMEME["RotationSlider_SliderValue"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["RotationSlider_SliderValue"]["TextSize"] = 15;
+MrMEME["RotationSlider_SliderValue"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["RotationSlider_SliderValue"]["AnchorPoint"] = Vector2.new(0.5, 0);
+MrMEME["RotationSlider_SliderValue"]["Size"] = UDim2.new(0, 100, 0, 20);
+MrMEME["RotationSlider_SliderValue"]["Position"] = UDim2.new(0.5, 0, 0, 110);
+MrMEME["RotationSlider_SliderValue"]["Text"] = [[0.00]];
+
+MrMEME["RotationSlider_AxisX"] = Instance.new("TextButton", MrMEME["RotationSlider"]);
+MrMEME["RotationSlider_AxisX"]["Name"] = [[AxisX]];
+MrMEME["RotationSlider_AxisX"]["BorderSizePixel"] = 0;
+MrMEME["RotationSlider_AxisX"]["BackgroundColor3"] = Color3.fromRGB(0, 142, 0);
+MrMEME["RotationSlider_AxisX"]["TextSize"] = 14;
+MrMEME["RotationSlider_AxisX"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["RotationSlider_AxisX"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["RotationSlider_AxisX"]["Size"] = UDim2.new(0, 40, 0, 20);
+MrMEME["RotationSlider_AxisX"]["Position"] = UDim2.new(0.5, -60, 0, 40);
+MrMEME["RotationSlider_AxisX"]["Text"] = [[X]];
+
+MrMEME["RotationSlider_AxisX_UICorner"] = Instance.new("UICorner", MrMEME["RotationSlider_AxisX"]);
+MrMEME["RotationSlider_AxisX_UICorner"]["CornerRadius"] = UDim.new(0, 5);
+
+MrMEME["RotationSlider_AxisY"] = Instance.new("TextButton", MrMEME["RotationSlider"]);
+MrMEME["RotationSlider_AxisY"]["Name"] = [[AxisY]];
+MrMEME["RotationSlider_AxisY"]["BorderSizePixel"] = 0;
+MrMEME["RotationSlider_AxisY"]["BackgroundColor3"] = Color3.fromRGB(0, 142, 0);
+MrMEME["RotationSlider_AxisY"]["TextSize"] = 14;
+MrMEME["RotationSlider_AxisY"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["RotationSlider_AxisY"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["RotationSlider_AxisY"]["Size"] = UDim2.new(0, 40, 0, 20);
+MrMEME["RotationSlider_AxisY"]["Position"] = UDim2.new(0.5, -20, 0, 40);
+MrMEME["RotationSlider_AxisY"]["Text"] = [[Y]];
+
+MrMEME["RotationSlider_AxisY_UICorner"] = Instance.new("UICorner", MrMEME["RotationSlider_AxisY"]);
+MrMEME["RotationSlider_AxisY_UICorner"]["CornerRadius"] = UDim.new(0, 5);
+
+MrMEME["RotationSlider_AxisZ"] = Instance.new("TextButton", MrMEME["RotationSlider"]);
+MrMEME["RotationSlider_AxisZ"]["Name"] = [[AxisZ]];
+MrMEME["RotationSlider_AxisZ"]["BorderSizePixel"] = 0;
+MrMEME["RotationSlider_AxisZ"]["BackgroundColor3"] = Color3.fromRGB(0, 142, 0);
+MrMEME["RotationSlider_AxisZ"]["TextSize"] = 14;
+MrMEME["RotationSlider_AxisZ"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["RotationSlider_AxisZ"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["RotationSlider_AxisZ"]["Size"] = UDim2.new(0, 40, 0, 20);
+MrMEME["RotationSlider_AxisZ"]["Position"] = UDim2.new(0.5, 20, 0, 40);
+MrMEME["RotationSlider_AxisZ"]["Text"] = [[Z]];
+
+MrMEME["RotationSlider_AxisZ_UICorner"] = Instance.new("UICorner", MrMEME["RotationSlider_AxisZ"]);
+MrMEME["RotationSlider_AxisZ_UICorner"]["CornerRadius"] = UDim.new(0, 5);
+
+MrMEME["RotationSlider_AxisLabel"] = Instance.new("TextLabel", MrMEME["RotationSlider"]);
+MrMEME["RotationSlider_AxisLabel"]["Name"] = [[AxisLabel]];
+MrMEME["RotationSlider_AxisLabel"]["TextWrapped"] = true;
+MrMEME["RotationSlider_AxisLabel"]["BorderSizePixel"] = 0;
+MrMEME["RotationSlider_AxisLabel"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["RotationSlider_AxisLabel"]["BackgroundTransparency"] = 1;
+MrMEME["RotationSlider_AxisLabel"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["RotationSlider_AxisLabel"]["TextSize"] = 15;
+MrMEME["RotationSlider_AxisLabel"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["RotationSlider_AxisLabel"]["AnchorPoint"] = Vector2.new(0.5, 0);
+MrMEME["RotationSlider_AxisLabel"]["Size"] = UDim2.new(0, 100, 0, 20);
+MrMEME["RotationSlider_AxisLabel"]["Position"] = UDim2.new(0.5, 0, 0, 70);
+MrMEME["RotationSlider_AxisLabel"]["Text"] = [[Current Axis: X]];
+
+
+-- New UI elements for Position Slider
+MrMEME["PositionSlider"] = Instance.new("Frame", MrMEME["1"]);
+MrMEME["PositionSlider"]["Name"] = [[PositionSlider]];
+MrMEME["PositionSlider"]["BorderSizePixel"] = 0;
+MrMEME["PositionSlider"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["PositionSlider"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["PositionSlider"]["Size"] = UDim2.new(0, 250, 0, 150);
+MrMEME["PositionSlider"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["PositionSlider"]["Position"] = UDim2.new(0.5, 0, 0.5, 0);
+MrMEME["PositionSlider"]["Visible"] = false; -- Initially hidden
+
+MrMEME["PositionSlider_UICorner"] = Instance.new("UICorner", MrMEME["PositionSlider"]);
+MrMEME["PositionSlider_UICorner"]["CornerRadius"] = UDim.new(0, 5);
+
+MrMEME["PositionSlider_UIGradient"] = Instance.new("UIGradient", MrMEME["PositionSlider"]);
+MrMEME["PositionSlider_UIGradient"]["Rotation"] = 35;
+MrMEME["PositionSlider_UIGradient"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(28, 28, 28)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(29, 86, 0))};
+
+MrMEME["PositionSlider_Title"] = Instance.new("TextLabel", MrMEME["PositionSlider"]);
+MrMEME["PositionSlider_Title"]["TextWrapped"] = true;
+MrMEME["PositionSlider_Title"]["BorderSizePixel"] = 0;
+MrMEME["PositionSlider_Title"]["TextScaled"] = true;
+MrMEME["PositionSlider_Title"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["PositionSlider_Title"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["PositionSlider_Title"]["TextSize"] = 22;
+MrMEME["PositionSlider_Title"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["PositionSlider_Title"]["AnchorPoint"] = Vector2.new(0.5, 0);
+MrMEME["PositionSlider_Title"]["Size"] = UDim2.new(0, 200, 0, 23);
+MrMEME["PositionSlider_Title"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["PositionSlider_Title"]["Text"] = [[Position Slider]];
+MrMEME["PositionSlider_Title"]["Name"] = [[Title]];
+MrMEME["PositionSlider_Title"]["BackgroundTransparency"] = 1;
+MrMEME["PositionSlider_Title"]["Position"] = UDim2.new(0.5, 0, 0, 7);
+
+MrMEME["PositionSlider_Title_UIGradient"] = Instance.new("UIGradient", MrMEME["PositionSlider_Title"]);
+MrMEME["PositionSlider_Title_UIGradient"]["Rotation"] = 180;
+MrMEME["PositionSlider_Title_UIGradient"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(250, 250, 250)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(46, 210, 0))};
+
+MrMEME["PositionSlider_Exit"] = Instance.new("TextButton", MrMEME["PositionSlider"]);
+MrMEME["PositionSlider_Exit"]["BorderSizePixel"] = 0;
+MrMEME["PositionSlider_Exit"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["PositionSlider_Exit"]["TextSize"] = 14;
+MrMEME["PositionSlider_Exit"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["PositionSlider_Exit"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["PositionSlider_Exit"]["AnchorPoint"] = Vector2.new(1, 0);
+MrMEME["PositionSlider_Exit"]["Size"] = UDim2.new(0, 30, 0, 20);
+MrMEME["PositionSlider_Exit"]["Name"] = [[Exit]];
+MrMEME["PositionSlider_Exit"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+MrMEME["PositionSlider_Exit"]["Text"] = [[X]];
+MrMEME["PositionSlider_Exit"]["Position"] = UDim2.new(1, -5, 0, 5);
+MrMEME["PositionSlider_Exit"]["BackgroundTransparency"] = 0.5;
+
+MrMEME["PositionSlider_Exit_UICorner"] = Instance.new("UICorner", MrMEME["PositionSlider_Exit"]);
+MrMEME["PositionSlider_Exit_UICorner"]["CornerRadius"] = UDim.new(0, 5);
+
+MrMEME["PositionSlider_Exit_UIGradient"] = Instance.new("UIGradient", MrMEME["PositionSlider_Exit"]);
+MrMEME["PositionSlider_Exit_UIGradient"]["Rotation"] = 9;
+MrMEME["PositionSlider_Exit_UIGradient"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(200, 0, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(255, 50, 50))};
+
+MrMEME["PositionSlider_SliderTrack"] = Instance.new("Frame", MrMEME["PositionSlider"]);
+MrMEME["PositionSlider_SliderTrack"]["Name"] = [[SliderTrack]];
+MrMEME["PositionSlider_SliderTrack"]["BorderSizePixel"] = 0;
+MrMEME["PositionSlider_SliderTrack"]["BackgroundColor3"] = Color3.fromRGB(50, 50, 50);
+MrMEME["PositionSlider_SliderTrack"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["PositionSlider_SliderTrack"]["Size"] = UDim2.new(0, 200, 0, 10);
+MrMEME["PositionSlider_SliderTrack"]["Position"] = UDim2.new(0.5, 0, 0.5, 0);
+
+MrMEME["PositionSlider_SliderTrack_UICorner"] = Instance.new("UICorner", MrMEME["PositionSlider_SliderTrack"]);
+MrMEME["PositionSlider_SliderTrack_UICorner"]["CornerRadius"] = UDim.new(0, 5);
+
+MrMEME["PositionSlider_SliderThumb"] = Instance.new("TextButton", MrMEME["PositionSlider_SliderTrack"]);
+MrMEME["PositionSlider_SliderThumb"]["Name"] = [[SliderThumb]];
+MrMEME["PositionSlider_SliderThumb"]["BorderSizePixel"] = 0;
+MrMEME["PositionSlider_SliderThumb"]["BackgroundColor3"] = Color3.fromRGB(0, 142, 0);
+MrMEME["PositionSlider_SliderThumb"]["AnchorPoint"] = Vector2.new(0.5, 0.5);
+MrMEME["PositionSlider_SliderThumb"]["Size"] = UDim2.new(0, 20, 0, 20);
+MrMEME["PositionSlider_SliderThumb"]["Position"] = UDim2.new(0.5, 0, 0.5, 0); -- Start in middle
+MrMEME["PositionSlider_SliderThumb"]["Text"] = [[]];
+MrMEME["PositionSlider_SliderThumb"]["Active"] = true;
+MrMEME["PositionSlider_SliderThumb"]["Selectable"] = true;
+
+MrMEME["PositionSlider_SliderThumb_UICorner"] = Instance.new("UICorner", MrMEME["PositionSlider_SliderThumb"]);
+MrMEME["PositionSlider_SliderThumb_UICorner"]["CornerRadius"] = UDim.new(0, 10);
+
+MrMEME["PositionSlider_SliderThumb_UIGradient"] = Instance.new("UIGradient", MrMEME["PositionSlider_SliderThumb"]);
+MrMEME["PositionSlider_SliderThumb_UIGradient"]["Rotation"] = 9;
+MrMEME["PositionSlider_SliderThumb_UIGradient"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 142, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(73, 218, 0))};
+
+MrMEME["PositionSlider_SliderValue"] = Instance.new("TextLabel", MrMEME["PositionSlider"]);
+MrMEME["PositionSlider_SliderValue"]["Name"] = [[SliderValue]];
+MrMEME["PositionSlider_SliderValue"]["TextWrapped"] = true;
+MrMEME["PositionSlider_SliderValue"]["BorderSizePixel"] = 0;
+MrMEME["PositionSlider_SliderValue"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["PositionSlider_SliderValue"]["BackgroundTransparency"] = 1;
+MrMEME["PositionSlider_SliderValue"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["PositionSlider_SliderValue"]["TextSize"] = 15;
+MrMEME["PositionSlider_SliderValue"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["PositionSlider_SliderValue"]["AnchorPoint"] = Vector2.new(0.5, 0);
+MrMEME["PositionSlider_SliderValue"]["Size"] = UDim2.new(0, 100, 0, 20);
+MrMEME["PositionSlider_SliderValue"]["Position"] = UDim2.new(0.5, 0, 0, 110);
+MrMEME["PositionSlider_SliderValue"]["Text"] = [[0.00]];
+
+MrMEME["PositionSlider_AxisX"] = Instance.new("TextButton", MrMEME["PositionSlider"]);
+MrMEME["PositionSlider_AxisX"]["Name"] = [[AxisX]];
+MrMEME["PositionSlider_AxisX"]["BorderSizePixel"] = 0;
+MrMEME["PositionSlider_AxisX"]["BackgroundColor3"] = Color3.fromRGB(0, 142, 0);
+MrMEME["PositionSlider_AxisX"]["TextSize"] = 14;
+MrMEME["PositionSlider_AxisX"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["PositionSlider_AxisX"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["PositionSlider_AxisX"]["Size"] = UDim2.new(0, 40, 0, 20);
+MrMEME["PositionSlider_AxisX"]["Position"] = UDim2.new(0.5, -60, 0, 40);
+MrMEME["PositionSlider_AxisX"]["Text"] = [[X]];
+
+MrMEME["PositionSlider_AxisX_UICorner"] = Instance.new("UICorner", MrMEME["PositionSlider_AxisX"]);
+MrMEME["PositionSlider_AxisX_UICorner"]["CornerRadius"] = UDim.new(0, 5);
+
+MrMEME["PositionSlider_AxisY"] = Instance.new("TextButton", MrMEME["PositionSlider"]);
+MrMEME["PositionSlider_AxisY"]["Name"] = [[AxisY]];
+MrMEME["PositionSlider_AxisY"]["BorderSizePixel"] = 0;
+MrMEME["PositionSlider_AxisY"]["BackgroundColor3"] = Color3.fromRGB(0, 142, 0);
+MrMEME["PositionSlider_AxisY"]["TextSize"] = 14;
+MrMEME["PositionSlider_AxisY"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["PositionSlider_AxisY"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["PositionSlider_AxisY"]["Size"] = UDim2.new(0, 40, 0, 20);
+MrMEME["PositionSlider_AxisY"]["Position"] = UDim2.new(0.5, -20, 0, 40);
+MrMEME["PositionSlider_AxisY"]["Text"] = [[Y]];
+
+MrMEME["PositionSlider_AxisY_UICorner"] = Instance.new("UICorner", MrMEME["PositionSlider_AxisY"]);
+MrMEME["PositionSlider_AxisY_UICorner"]["CornerRadius"] = UDim.new(0, 5);
+
+MrMEME["PositionSlider_AxisZ"] = Instance.new("TextButton", MrMEME["PositionSlider"]);
+MrMEME["PositionSlider_AxisZ"]["Name"] = [[AxisZ]];
+MrMEME["PositionSlider_AxisZ"]["BorderSizePixel"] = 0;
+MrMEME["PositionSlider_AxisZ"]["BackgroundColor3"] = Color3.fromRGB(0, 142, 0);
+MrMEME["PositionSlider_AxisZ"]["TextSize"] = 14;
+MrMEME["PositionSlider_AxisZ"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+MrMEME["PositionSlider_AxisZ"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["PositionSlider_AxisZ"]["Size"] = UDim2.new(0, 40, 0, 20);
+MrMEME["PositionSlider_AxisZ"]["Position"] = UDim2.new(0.5, 20, 0, 40);
+MrMEME["PositionSlider_AxisZ"]["Text"] = [[Z]];
+
+MrMEME["PositionSlider_AxisZ_UICorner"] = Instance.new("UICorner", MrMEME["PositionSlider_AxisZ"]);
+MrMEME["PositionSlider_AxisZ_UICorner"]["CornerRadius"] = UDim.new(0, 5);
+
+MrMEME["PositionSlider_AxisLabel"] = Instance.new("TextLabel", MrMEME["PositionSlider"]);
+MrMEME["PositionSlider_AxisLabel"]["Name"] = [[AxisLabel]];
+MrMEME["PositionSlider_AxisLabel"]["TextWrapped"] = true;
+MrMEME["PositionSlider_AxisLabel"]["BorderSizePixel"] = 0;
+MrMEME["PositionSlider_AxisLabel"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["PositionSlider_AxisLabel"]["BackgroundTransparency"] = 1;
+MrMEME["PositionSlider_AxisLabel"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
+MrMEME["PositionSlider_AxisLabel"]["TextSize"] = 15;
+MrMEME["PositionSlider_AxisLabel"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+MrMEME["PositionSlider_AxisLabel"]["AnchorPoint"] = Vector2.new(0.5, 0);
+MrMEME["PositionSlider_AxisLabel"]["Size"] = UDim2.new(0, 100, 0, 20);
+MrMEME["PositionSlider_AxisLabel"]["Position"] = UDim2.new(0.5, 0, 0, 70);
+MrMEME["PositionSlider_AxisLabel"]["Text"] = [[Current Axis: X]];
+
+
+-- RotSliderHandler (LocalScript for RotationSlider)
+MrMEME["RotSliderHandler"] = Instance.new("LocalScript", MrMEME["RotationSlider"]);
+MrMEME["RotSliderHandler"]["Name"] = [[RotSliderHandler]];
+
+-- PosSliderHandler (LocalScript for PositionSlider)
+MrMEME["PosSliderHandler"] = Instance.new("LocalScript", MrMEME["PositionSlider"]);
+MrMEME["PosSliderHandler"]["Name"] = [[PosSliderHandler]];
+
+
+-- Require MrMEME wrapper
+local G2L_CHILLZ_REQUIRE = require;
+local G2L_CHILLZ_MODULES = {};
+local function require(Module:ModuleScript)
+    local ModuleState = G2L_CHILLZ_MODULES[Module];
+    if ModuleState then
+        if not ModuleState.Required then
+            ModuleState.Required = true;
+            ModuleState.Value = ModuleState.Closure();
+        end
+        return ModuleState.Value;
+    end;
+    return G2L_CHILLZ_REQUIRE(Module);
+end
+
+G2L_CHILLZ_MODULES[MrMEME["8d"]] = {
+Closure = function()
+    local script = MrMEME["8d"];
+local module = {}
+
+function module:GetCurrentTool()
+	local tool = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool")
+	if tool then
+		return tool
+	else
+		-- Yield until a tool is found or a timeout (optional)
+		local foundTool = nil
+		local timeout = 5 -- seconds
+		local startTime = tick()
+		while not foundTool and (tick() - startTime < timeout) do
+			foundTool = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool")
+			if not foundTool then
+				task.wait(0.1) -- Wait a short period before re-checking
+			end
+		end
+		return foundTool
+	end
+end
+
+function module:EquipAllTool()
+	local tool = game.Players.LocalPlayer.Backpack:GetChildren()
+	if tool then
+		for i, v in pairs(tool) do
+			if v:IsA("Tool") then -- Ensure it's actually a tool
+				v.Parent = game.Players.LocalPlayer.Character
+			end
+		end
+	else
+		return nil
+	end
+end
+
+-- Removed DeleteCurrentTool and DeleteAllTools as per user request to replace them with sliders.
+-- If you need these functionalities back, they can be re-added as separate buttons.
+
+function module:EnableDragFrame(Frame)
+	local dragToggle
+	local dragSpeed = .25
+	local dragInput
+	local dragStart
+	local startPos
+
+	local function updateInput(input)
+		local Delta = input.Position - dragStart
+		local Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + Delta.X, startPos.Y.Scale, startPos.Y.Offset + Delta.Y)
+		game:GetService("TweenService"):Create(Frame, TweenInfo.new(.25), {Position = Position}):Play()
+	end
+
+	Frame.InputBegan:Connect(function(input)
+		if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+			dragToggle = true
+			dragStart = input.Position
+			startPos = Frame.Position
+			input.Changed:Connect(function()
+				if (input.UserInputState == Enum.UserInputState.End) then
+					dragToggle = false
+				end
+			end)
+		end
+	end)
+
+	Frame.InputChanged:Connect(function(input)
+		if (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+			dragInput = input
+		end
+	end)
+
+	game:GetService("UserInputService").InputChanged:Connect(function(input)
+		if (input == dragInput and dragToggle) then
+			updateInput(input)
+		end
+	end)
+end
+
+return module
+
+end;
+};
+-- StarterGui.ToolTweaks.Main.MainHandler
+local function C_28()
+local script = MrMEME["28"];
+	local Center = require(script.Parent.Parent.CenterModule)
+	Center:EnableDragFrame(script.Parent)
+	
+	local tools = script.Parent.Tools
+	local gui = script.Parent.Parent
+	
+	tools.RotationUtils.MouseButton1Click:Connect(function()
+		gui.RotationUtils.Visible = true
+	end)
+	tools.PositionUtils.MouseButton1Click:Connect(function()
+		gui.PositionUtils.Visible = true
+	end)
+	tools.EquipAll.MouseButton1Click:Connect(function()
+		Center:EquipAllTool()
+	end)
+	
+	-- New connections for sliders
+	tools.SliderR.MouseButton1Click:Connect(function()
+		gui.RotationSlider.Visible = true
+		gui.RotationSlider.Position = UDim2.new(0.5, 0, 0.5, 0) -- Reset position
+	end)
+	tools.SliderP.MouseButton1Click:Connect(function()
+		gui.PositionSlider.Visible = true
+		gui.PositionSlider.Position = UDim2.new(0.5, 0, 0.5, 0) -- Reset position
+	end)
+end;
+task.spawn(C_28);
+
+-- StarterGui.ToolTweaks.RotationUtils.RotUtilHandler (Existing rotation utility handler)
+local function C_59()
+local script = MrMEME["59"];
+	local Center = require(script.Parent.Parent.CenterModule)
+	Center:EnableDragFrame(script.Parent)
+	
+	local tweenserv = game:GetService("TweenService")
+	
+	local function tween(item, prop)
+		local info = TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0)
+		
+		local tween = tweenserv:Create(item,info, prop)
+		tween:Play()
+	end
+	
+	-- RotButton Handler
+	local buttons = script.Parent
+	
+	
+	buttons.Up.MouseButton1Click:Connect(function()
+		local tool = Center:GetCurrentTool()
+		if tool then
+			local input = tonumber(buttons.Input.TextBox.Text) or 0.5
+			tween(tool, { Grip = tool.Grip * CFrame.Angles(-math.rad(input), 0, 0) })
+		end
+	end)
+	buttons.Down.MouseButton1Click:Connect(function()
+		local tool = Center:GetCurrentTool()
+		if tool then
+			local input = tonumber(buttons.Input.TextBox.Text) or 0.5
+			tween(tool, { Grip = tool.Grip * CFrame.Angles(math.rad(input), 0, 0) })
+		end
+	end)
+	buttons.Left.MouseButton1Click:Connect(function()
+		local tool = Center:GetCurrentTool()
+		if tool then
+			local input = tonumber(buttons.Input.TextBox.Text) or 0.5
+			tween(tool, { Grip = tool.Grip * CFrame.Angles(0, math.rad(input), 0) })
+		end
+	end)
+	buttons.Right.MouseButton1Click:Connect(function()
+		local tool = Center:GetCurrentTool()
+		if tool then
+			local input = tonumber(buttons.Input.TextBox.Text) or 0.5
+			tween(tool, { Grip = tool.Grip * CFrame.Angles(0, -math.rad(input), 0) })
+		end
+	end)
+	buttons.TLeft.MouseButton1Click:Connect(function()
+		local tool = Center:GetCurrentTool()
+		if tool then
+			local input = tonumber(buttons.Input.TextBox.Text) or 0.5
+			tween(tool, { Grip = tool.Grip * CFrame.Angles(0, 0, math.rad(input)) })
+		end
+	end)
+	buttons.TRight.MouseButton1Click:Connect(function()
+		local tool = Center:GetCurrentTool()
+		if tool then
+			local input = tonumber(buttons.Input.TextBox.Text) or 0.5
+			tween(tool, { Grip = tool.Grip * CFrame.Angles(0, 0, -math.rad(input)) })
+		end
+	end)
+	
+	buttons.Exit.MouseButton1Click:Connect(function()
+		script.Parent.Visible = false
+		script.Parent.Position = UDim2.new(0.5, 0,0.5, 0)
+	end)
+end;
+task.spawn(C_59);
+
+-- StarterGui.ToolTweaks.PositionUtils.PosUtilHandler (Existing position utility handler)
+local function C_8a()
+local script = MrMEME["8a"];
+	local Center = require(script.Parent.Parent.CenterModule)
+	Center:EnableDragFrame(script.Parent)
+	
+	local tweenserv = game:GetService("TweenService")
+	
+	local function tween(item, prop)
+		local info = TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0)
+	
+		local tween = tweenserv:Create(item,info, prop)
+		tween:Play()
+	end
+	
+	-- PosButton Handler
+	local buttons = script.Parent
+	
+	
+	buttons.Up.MouseButton1Click:Connect(function()
+		local tool = Center:GetCurrentTool()
+		if tool then
+			local input = tonumber(buttons.Input.TextBox.Text) or 0.5
+			tween(tool, { Grip = tool.Grip * CFrame.new(0, -input, 0) })
+		end
+	end)
+	buttons.Down.MouseButton1Click:Connect(function()
+		local tool = Center:GetCurrentTool()
+		if tool then
+			local input = tonumber(buttons.Input.TextBox.Text) or 0.5
+			tween(tool, { Grip = tool.Grip * CFrame.new(0, input, 0) })
+		end
+	end)
+	buttons.Left.MouseButton1Click:Connect(function()
+		local tool = Center:GetCurrentTool()
+		if tool then
+			local input = tonumber(buttons.Input.TextBox.Text) or 0.5
+			tween(tool, { Grip = tool.Grip * CFrame.new(-input, 0, 0) })
+		end
+	end)
+	buttons.Right.MouseButton1Click:Connect(function()
+		local tool = Center:GetCurrentTool()
+		if tool then
+			local input = tonumber(buttons.Input.TextBox.Text) or 0.5
+			tween(tool, { Grip = tool.Grip * CFrame.new(input, 0, 0) })
+		end
+	end)
+	buttons.Front.MouseButton1Click:Connect(function()
+		local tool = Center:GetCurrentTool()
+		if tool then
+			local input = tonumber(buttons.Input.TextBox.Text) or 0.5
+			tween(tool, { Grip = tool.Grip * CFrame.new(0, 0, input) })
+		end
+	end)
+	buttons.Back.MouseButton1Click:Connect(function()
+		local tool = Center:GetCurrentTool()
+		if tool then
+			local input = tonumber(buttons.Input.TextBox.Text) or 0.5
+			tween(tool, { Grip = tool.Grip * CFrame.new(0, 0, -input) })
+		end
+	end)
+	
+	buttons.Exit.MouseButton1Click:Connect(function()
+		script.Parent.Visible = false
+		script.Parent.Position = UDim2.new(0.5, 0,0.5, 0)
+	end)
+end;
+task.spawn(C_8a);
+
+-- RotSliderHandler (LocalScript for RotationSlider)
+local function RotSliderHandler_Func()
+    local script = MrMEME["RotSliderHandler"];
+    local Center = require(script.Parent.Parent.CenterModule)
+    Center:EnableDragFrame(script.Parent) -- Enable dragging for the slider UI itself
+
+    local tweenserv = game:GetService("TweenService")
+
+    local function tween(item, prop)
+        local info = TweenInfo.new(0.05, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0)
+        local tween = tweenserv:Create(item, info, prop)
+        tween:Play()
+    end
+
+    local sliderTrack = script.Parent.SliderTrack
+    local sliderThumb = sliderTrack.SliderThumb
+    local sliderValueLabel = script.Parent.SliderValue
+    local axisXButton = script.Parent.AxisX
+    local axisYButton = script.Parent.AxisY
+    local axisZButton = script.Parent.AxisZ
+    local axisLabel = script.Parent.AxisLabel
+    local exitButton = script.Parent.Exit
+
+    local minRotation = -180 -- degrees
+    local maxRotation = 180  -- degrees
+    local currentAxis = "X" -- Default axis
+    local currentRotationValue = 0
+
+    local isDragging = false
+    local dragStartOffset = 0 -- Offset from thumb's left edge to mouse X
+
+    local function updateSliderThumbPosition(value)
+        local normalizedPosition = (value - minRotation) / (maxRotation - minRotation)
+        local trackWidth = sliderTrack.AbsoluteSize.X
+        local thumbWidth = sliderThumb.AbsoluteSize.X
+        local newXOffset = normalizedPosition * (trackWidth - thumbWidth)
+        sliderThumb.Position = UDim2.new(0, newXOffset, 0.5, 0)
+    end
+
+    local function updateRotation(value)
+        local tool = Center:GetCurrentTool()
+        if tool then
+            local currentGrip = tool.Grip
+
+            -- Reset rotation to identity before applying new rotation for the selected axis
+            -- This ensures that only the selected axis is affected by the slider,
+            -- preventing cumulative rotations on unselected axes when switching.
+            local currentPos = currentGrip.p
+            local newGrip = CFrame.new(currentPos)
+
+            if currentAxis == "X" then
+                newGrip = newGrip * CFrame.Angles(math.rad(value), currentGrip:ToEulerAnglesXYZ())[2], currentGrip:ToEulerAnglesXYZ())[3])
+            elseif currentAxis == "Y" then
+                newGrip = newGrip * CFrame.Angles(currentGrip:ToEulerAnglesXYZ())[1], math.rad(value), currentGrip:ToEulerAnglesXYZ())[3])
+            elseif currentAxis == "Z" then
+                newGrip = newGrip * CFrame.Angles(currentGrip:ToEulerAnglesXYZ())[1], currentGrip:ToEulerAnglesXYZ())[2], math.rad(value))
+            end
+            tween(tool, { Grip = newGrip })
+        end
+        sliderValueLabel.Text = string.format("%.2f", value)
+        currentRotationValue = value
+    end
+
+    local function setAxis(axis)
+        currentAxis = axis
+        axisLabel.Text = "Current Axis: " .. currentAxis
+        -- When axis changes, reset slider to 0 or current tool's rotation on that axis
+        local tool = Center:GetCurrentTool()
+        if tool then
+            local x, y, z = tool.Grip:ToEulerAnglesXYZ()
+            local currentAngle = 0
+            if currentAxis == "X" then
+                currentAngle = math.deg(x)
+            elseif currentAxis == "Y" then
+                currentAngle = math.deg(y)
+            elseif currentAxis == "Z" then
+                currentAngle = math.deg(z)
+            end
+            updateSliderThumbPosition(currentAngle)
+            sliderValueLabel.Text = string.format("%.2f", currentAngle)
+        else
+            updateSliderThumbPosition(0)
+            sliderValueLabel.Text = string.format("%.2f", 0)
+        end
+    end
+
+    -- Initial setup
+    setAxis("X") -- Set initial axis to X
+
+    sliderThumb.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            isDragging = true
+            -- Calculate initial offset from thumb's left edge to mouse X
+            dragStartOffset = input.Position.X - sliderThumb.AbsolutePosition.X
+        end
+    end)
+
+    sliderThumb.InputChanged:Connect(function(input)
+        if isDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local newAbsoluteX = input.Position.X - dragStartOffset
+            local newRelativeX = newAbsoluteX - sliderTrack.AbsolutePosition.X
+
+            local trackWidth = sliderTrack.AbsoluteSize.X
+            local thumbWidth = sliderThumb.AbsoluteSize.X
+            
+            local clampedX = math.clamp(newRelativeX, 0, trackWidth - thumbWidth)
+            
+            local normalizedPosition = clampedX / (trackWidth - thumbWidth)
+            local value = minRotation + (maxRotation - minRotation) * normalizedPosition
+            
+            -- Keep the thumb centered on the track's height
+            sliderThumb.Position = UDim2.new(0, clampedX, 0.5, 0)
+            
+            updateRotation(value)
+        end
+    end)
+
+    sliderThumb.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            isDragging = false
+        end
+    end)
+
+    axisXButton.MouseButton1Click:Connect(function() setAxis("X") end)
+    axisYButton.MouseButton1Click:Connect(function() setAxis("Y") end)
+    axisZButton.MouseButton1Click:Connect(function() setAxis("Z") end)
+
+    exitButton.MouseButton1Click:Connect(function()
+        script.Parent.Visible = false
+        script.Parent.Position = UDim2.new(0.5, 0, 0.5, 0)
+    end)
+end;
+task.spawn(RotSliderHandler_Func);
+
+-- PosSliderHandler (LocalScript for PositionSlider)
+local function PosSliderHandler_Func()
+    local script = MrMEME["PosSliderHandler"];
+    local Center = require(script.Parent.Parent.CenterModule)
+    Center:EnableDragFrame(script.Parent) -- Enable dragging for the slider UI itself
+
+    local tweenserv = game:GetService("TweenService")
+
+    local function tween(item, prop)
+        local info = TweenInfo.new(0.05, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0)
+        local tween = tweenserv:Create(item, info, prop)
+        tween:Play()
+    end
+
+    local sliderTrack = script.Parent.SliderTrack
+    local sliderThumb = sliderTrack.SliderThumb
+    local sliderValueLabel = script.Parent.SliderValue
+    local axisXButton = script.Parent.AxisX
+    local axisYButton = script.Parent.AxisY
+    local axisZButton = script.Parent.AxisZ
+    local axisLabel = script.Parent.AxisLabel
+    local exitButton = script.Parent.Exit
+
+    local minPosition = -10 -- units
+    local maxPosition = 10  -- units
+    local currentAxis = "X" -- Default axis
+    local currentPositionValue = 0
+
+    local isDragging = false
+    local dragStartOffset = 0 -- Offset from thumb's left edge to mouse X
+
+    local function updateSliderThumbPosition(value)
+        local normalizedPosition = (value - minPosition) / (maxPosition - minPosition)
+        local trackWidth = sliderTrack.AbsoluteSize.X
+        local thumbWidth = sliderThumb.AbsoluteSize.X
+        local newXOffset = normalizedPosition * (trackWidth - thumbWidth)
+        sliderThumb.Position = UDim2.new(0, newXOffset, 0.5, 0)
+    end
+
+    local function updatePosition(value)
+        local tool = Center:GetCurrentTool()
+        if tool then
+            local currentGrip = tool.Grip
+            local newX, newY, newZ = currentGrip.X, currentGrip.Y, currentGrip.Z
+
+            if currentAxis == "X" then
+                newX = value
+            elseif currentAxis == "Y" then
+                newY = value
+            elseif currentAxis == "Z" then
+                newZ = value
+            end
+            
+            -- Reconstruct CFrame with new position and original orientation
+            local newPos = Vector3.new(newX, newY, newZ)
+            local newGrip = CFrame.new(newPos) * (currentGrip - currentGrip.p) -- Preserve orientation
+
+            tween(tool, { Grip = newGrip })
+        end
+        sliderValueLabel.Text = string.format("%.2f", value)
+        currentPositionValue = value
+    end
+
+    local function setAxis(axis)
+        currentAxis = axis
+        axisLabel.Text = "Current Axis: " .. currentAxis
+        -- When axis changes, reset slider to 0 or current tool's position on that axis
+        local tool = Center:GetCurrentTool()
+        if tool then
+            local x, y, z = tool.Grip.X, tool.Grip.Y, tool.Grip.Z
+            local currentCoord = 0
+            if currentAxis == "X" then
+                currentCoord = x
+            elseif currentAxis == "Y" then
+                currentCoord = y
+            elseif currentAxis == "Z" then
+                currentCoord = z
+            end
+            updateSliderThumbPosition(currentCoord)
+            sliderValueLabel.Text = string.format("%.2f", currentCoord)
+        else
+            updateSliderThumbPosition(0)
+            sliderValueLabel.Text = string.format("%.2f", 0)
+        end
+    end
+
+    -- Initial setup
+    setAxis("X") -- Set initial axis to X
+
+    sliderThumb.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            isDragging = true
+            -- Calculate initial offset from thumb's left edge to mouse X
+            dragStartOffset = input.Position.X - sliderThumb.AbsolutePosition.X
+        end
+    end)
+
+    sliderThumb.InputChanged:Connect(function(input)
+        if isDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local newAbsoluteX = input.Position.X - dragStartOffset
+            local newRelativeX = newAbsoluteX - sliderTrack.AbsolutePosition.X
+
+            local trackWidth = sliderTrack.AbsoluteSize.X
+            local thumbWidth = sliderThumb.AbsoluteSize.X
+            
+            local clampedX = math.clamp(newRelativeX, 0, trackWidth - thumbWidth)
+            
+            local normalizedPosition = clampedX / (trackWidth - thumbWidth)
+            local value = minPosition + (maxPosition - minPosition) * normalizedPosition
+            
+            -- Keep the thumb centered on the track's height
+            sliderThumb.Position = UDim2.new(0, clampedX, 0.5, 0)
+            
+            updatePosition(value)
+        end
+    end)
+
+    sliderThumb.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            isDragging = false
+        end
+    end)
+
+    axisXButton.MouseButton1Click:Connect(function() setAxis("X") end)
+    axisYButton.MouseButton1Click:Connect(function() setAxis("Y") end)
+    axisZButton.MouseButton1Click:Connect(function() setAxis("Z") end)
+
+    exitButton.MouseButton1Click:Connect(function()
+        script.Parent.Visible = false
+        script.Parent.Position = UDim2.new(0.5, 0, 0.5, 0)
+    end)
+end;
+task.spawn(PosSliderHandler_Func);
+
+
+return MrMEME["1"], require;
