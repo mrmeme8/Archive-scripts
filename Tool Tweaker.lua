@@ -14,7 +14,7 @@ Features:
 Credits:
 - MrMeme: UI suggestions
 - Chat dev: Original Position and Rotation code
-- G): UI Redesign, slider code, freeze button code, and overall bug fixes/refinements
+- (G): UI Redesign, slider code, freeze button code, and overall bug fixes/refinements
 - Chillz for inspiring me to make this script heres his youtube: https://youtube.com/@chillz_azy?si=egYV43D2nSNe9k2r
 ]]
 
