@@ -448,8 +448,9 @@ local function setupControls(controls, axis, isRotation)
     -- Draggable slider
     local thumb = controls.SliderThumb
     local track = controls.SliderTrack
+
     local dragStartPos = nil
-    local dragConnection = nil
+    local dragConnection, inputChangedConnection = nil, nil
     local runServiceConnection = nil
 
     thumb.InputBegan:Connect(function(input)
@@ -466,76 +467,76 @@ local function setupControls(controls, axis, isRotation)
                     end
                 end
 
-                -- This connection only handles the visual thumb movement.
-                dragConnection = game:GetService("UserInputService").InputChanged:Connect(function(input)
+                local dragConnection = game:GetService("UserInputService").InputChanged:Connect(function(input)
                     if isSliderDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-                         local mouseX = input.Position.X
-                         local trackX = track.AbsolutePosition.X
-                         local trackWidth = track.AbsoluteSize.X
+                         local tool = CenterModule:GetCurrentTool()
+                         if tool then
+                            local mouseDeltaX = input.Position.X - dragStartPos
+                            -- Calculate the new thumb position based on the drag
+                            local newThumbX = math.clamp(0.5 + mouseDeltaX / track.AbsoluteSize.X, 0, 1)
+                            thumb.Position = UDim2.new(newThumbX, -9, 0.5, -9)
 
-                         -- Calculate the new thumb position based on the mouse's absolute position
-                         local newThumbX = math.clamp(mouseX - trackX, 0, trackWidth)
-                         thumb.Position = UDim2.new(0, newThumbX - 9, 0.5, -9)
+                            -- Calculate the change rate based on how far the thumb is from the center
+                            local changeRate = (newThumbX - 0.5) * 2
+                            local increment = tonumber(incrementInput.Text) or (isRotation and 1 or 0.1)
+
+                            -- Continuous update loop
+                            if not runServiceConnection then
+                                runServiceConnection = game:GetService("RunService").Heartbeat:Connect(function(dt)
+                                    local tool = CenterModule:GetCurrentTool()
+                                    if tool and isSliderDragging then
+                                        local totalChange = changeRate * increment * 10 * dt  -- Multiply by dt for frame-rate independence and 10 for a faster rate
+                                        local newGrip
+
+                                        if isRotation then
+                                            local rot = Vector3.new(
+                                                axis == "X" and totalChange or 0,
+                                                axis == "Y" and totalChange or 0,
+                                                axis == "Z" and totalChange or 0
+                                            )
+                                            newGrip = tool.Grip * CFrame.Angles(math.rad(rot.X), math.rad(rot.Y), math.rad(rot.Z))
+                                        else
+                                            local pos = Vector3.new(
+                                                axis == "X" and totalChange or 0,
+                                                axis == "Y" and totalChange or 0,
+                                                axis == "Z" and totalChange or 0
+                                            )
+                                            newGrip = tool.Grip * CFrame.new(pos)
+                                        end
+                                        tweenGrip(tool, newGrip)
+                                    end
+                                end)
+                            end
+                         end
                     end
                 end)
 
-                -- This loop continuously updates the tool's grip based on the thumb's current position.
-                runServiceConnection = game:GetService("RunService").Heartbeat:Connect(function(dt)
-                    local tool = CenterModule:GetCurrentTool()
-                    if tool and isSliderDragging then
-                        -- The changeRate is calculated every frame based on the thumb's live position.
-                        local changeRate = (thumb.Position.X.Scale - 0.5) * 2
+                inputChangedConnection = game:GetService("UserInputService").InputEnded:Connect(function(input)
+                     if isSliderDragging and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+                        isSliderDragging = false
+                        activeSliderThumb = nil
                         
-                        local increment = tonumber(incrementInput.Text) or (isRotation and 1 or 0.1)
-                        local totalChange = changeRate * increment * 10 * dt
-                        local newGrip
-
-                        if isRotation then
-                            local rot = Vector3.new(
-                                axis == "X" and totalChange or 0,
-                                axis == "Y" and totalChange or 0,
-                                axis == "Z" and totalChange or 0
-                            )
-                            newGrip = tool.Grip * CFrame.Angles(math.rad(rot.X), math.rad(rot.Y), math.rad(rot.Z))
-                        else
-                            local pos = Vector3.new(
-                                axis == "X" and totalChange or 0,
-                                axis == "Y" and totalChange or 0,
-                                axis == "Z" and totalChange or 0
-                            )
-                            newGrip = tool.Grip * CFrame.new(pos)
+                        -- Re-enable input for all sliders
+                        for _, slider in pairs(allSliders) do
+                            slider.Thumb.Active = true
                         end
-                        tweenGrip(tool, newGrip)
+                        
+                        -- Disconnect the continuous update loop
+                        if runServiceConnection then
+                            runServiceConnection:Disconnect()
+                            runServiceConnection = nil
+                        end
+
+                        -- Animate thumb back to center
+                        local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad)
+                        local tween = TweenService:Create(thumb, tweenInfo, {Position = UDim2.new(0.5, -9, 0.5, -9)})
+                        tween:Play()
+
+                        if dragConnection then dragConnection:Disconnect() end
+                        if inputChangedConnection then inputChangedConnection:Disconnect() end
                     end
                 end)
             end
-        end
-    end)
-
-    game:GetService("UserInputService").InputEnded:Connect(function(input)
-         if isSliderDragging and activeSliderThumb == thumb and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-            isSliderDragging = false
-            activeSliderThumb = nil
-            
-            -- Re-enable input for all sliders
-            for _, slider in pairs(allSliders) do
-                slider.Thumb.Active = true
-            end
-            
-            -- Disconnect the continuous update loop and drag connection
-            if runServiceConnection then
-                runServiceConnection:Disconnect()
-                runServiceConnection = nil
-            end
-            if dragConnection then
-                dragConnection:Disconnect()
-                dragConnection = nil
-            end
-
-            -- Animate thumb back to center
-            local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad)
-            local tween = TweenService:Create(thumb, tweenInfo, {Position = UDim2.new(0.5, -9, 0.5, -9)})
-            tween:Play()
         end
     end)
 end
