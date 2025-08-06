@@ -20,7 +20,7 @@ Bug Fixes:
 Credits:
 - MrMeme: UI suggestions
 - Chat dev: Original Position and Rotation code
-- G (Gemini): UI Redesign, slider code, freeze button code, and overall bug fixes/refinements
+- (G): UI Redesign, slider code, freeze button code, and overall bug fixes/refinements
 - Chillz: Inspiration for the script
 ]]
 
