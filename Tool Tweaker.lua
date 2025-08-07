@@ -19,7 +19,7 @@ Bug Fixes:
 - **Fixed a calculation error where the slider's position was being read incorrectly. The script now correctly determines the direction from the mouse's position relative to the slider track, ensuring left always decreases the value and right always increases it.**
 
 Credits:
-- MrMeme: UI suggestions
+- MrMeme: Creator of the original UI before redesign and some bits of the Rotation and Position code
 - Chat dev: Original Position and Rotation code
 - G (Gemini): UI Redesign, slider code, freeze button code, and overall bug fixes/refinements
 - Chillz: Inspiration for the script
