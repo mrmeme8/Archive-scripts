@@ -277,7 +277,7 @@ tween:Play()
 local char = player.Character
 local humanoid = char and char:FindFirstChildOfClass("Humanoid")
 if humanoid and tool and tool.Parent == char then
-    if not getgenv()._lastForceEquip or tick() - getgenv()._lastForceEquip > 0.03 then
+    if not getgenv()._lastForceEquip or tick() - getgenv()._lastForceEquip > 0.0001 then
         getgenv()._lastForceEquip = tick()
         pcall(function()
             humanoid:EquipTool(tool)
