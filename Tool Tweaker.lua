@@ -20,8 +20,8 @@ Bug Fixes:
 
 Credits:
 - MrMeme: Creator of the original UI before redesign and some bits of the Rotation and Position code
-- Chat dev: Original Position and Rotation code
-- G (Gemini): UI Redesign, slider code, freeze button code, and overall bug fixes/refinements
+- Chat dev: Original Position and Rotation code Added FE smoothing method (0.03s re-equip trick) for live tool grip updates
+- (G): UI Redesign, slider code, freeze button code, and overall bug fixes/refinements
 - Chillz: Inspiration for the script
 ]]
 
@@ -265,12 +265,29 @@ rotButton.MouseButton1Click:Connect(function()
     incrementInput.Text = "1"
 end)
 
-local function tweenGrip(tool, newGrip)
-    if not tool then return end
-    local tweenInfo = TweenInfo.new(0.05, Enum.EasingStyle.Linear)
-    local tween = TweenService:Create(tool, tweenInfo, {Grip = newGrip})
-    tween:Play()
+-- ✅ Add this function to the script above to replace the existing tweenGrip -- It now includes forced equip to replicate the Grip to other players (FE-compatible)
+
+local function tweenGrip(tool, newGrip) if not tool then return end
+
+local tweenInfo = TweenInfo.new(0.05, Enum.EasingStyle.Linear)
+local tween = TweenService:Create(tool, tweenInfo, {Grip = newGrip})
+tween:Play()
+
+-- 🔁 FE Replication: Force Equip to update server-side grip
+local char = player.Character
+local humanoid = char and char:FindFirstChildOfClass("Humanoid")
+if humanoid and tool and tool.Parent == char then
+    if not getgenv()._lastForceEquip or tick() - getgenv()._lastForceEquip > 0.03 then
+        getgenv()._lastForceEquip = tick()
+        pcall(function()
+            humanoid:EquipTool(tool)
+        end)
+    end
 end
+
+end
+
+
 
 local allSliders = {}
 
@@ -377,7 +394,8 @@ local function setupControls(controls, axis, isRotation)
                 axis == "Y" and change or 0,
                 axis == "Z" and change or 0
             )
-            newGrip = CFrame.new(tool.Grip.Position + pos) * tool.Grip.Rotation
+            local rx, ry, rz = tool.Grip:ToEulerAnglesXYZ()
+newGrip = CFrame.new(tool.Grip.Position + pos) * CFrame.fromEulerAnglesXYZ(rx, ry, rz)
         end
         tweenGrip(tool, newGrip)
     end
