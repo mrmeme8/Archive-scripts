@@ -25,36 +25,54 @@ Credits:
 - Chillz: Inspiration for the script
 ]]
 
-local player = game:GetService("Players").LocalPlayer
+local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
--- Check for and destroy existing UI to prevent duplicates
-local existingGui = player.PlayerGui:FindFirstChild("ToolTweaks")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Remove previous UI if re-executed
+local existingGui = playerGui:FindFirstChild("ToolTweaks")
 if existingGui then
     existingGui:Destroy()
 end
 
-local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+local gui = Instance.new("ScreenGui")
 gui.Name = "ToolTweaks"
+gui.Parent = playerGui
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.ResetOnSpawn = false
 
--- Helper module for shared functions
+-- Helper module
 local CenterModule = {}
 
 function CenterModule:GetCurrentTool()
-    local character = player.Character
-    if not character then return nil end
-    local tool = character:FindFirstChildOfClass("Tool")
+    local char = player.Character
+    if not char then return nil end
+    local tool = char:FindFirstChildOfClass("Tool")
     if tool and tool:IsA("Tool") and tool.Grip then
         return tool
     end
+    -- fallback: sometimes tool lives in Backpack and is equipped quickly; still return nil here
     return nil
 end
 
--- Global flag to prevent dragging the main frame when a slider is active
+-- Rotation tracker for infinite rotation
+local rotationTracker = { X = 0, Y = 0, Z = 0 }
+
+local function syncRotationWithTool(tool)
+    if not tool or not tool.Grip then return end
+    local ok, rx, ry, rz = pcall(function() return tool.Grip:ToEulerAnglesXYZ() end)
+    if ok and rx and ry and rz then
+        rotationTracker.X = math.deg(rx)
+        rotationTracker.Y = math.deg(ry)
+        rotationTracker.Z = math.deg(rz)
+    end
+end
+
+-- Drag frame helper (prevents dragging when slider is active)
 local isSliderDragging = false
 local activeSliderThumb = nil
 
@@ -65,12 +83,14 @@ function CenterModule:EnableDragFrame(frame)
     local startPos = nil
 
     local function update(input)
+        if not dragStart or not startPos then return end
         local delta = input.Position - dragStart
         frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
 
     frame.InputBegan:Connect(function(input)
-        if not isSliderDragging and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+        if isSliderDragging then return end
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = frame.Position
@@ -95,18 +115,35 @@ function CenterModule:EnableDragFrame(frame)
     end)
 end
 
+-- Tween grip and force-equip to replicate on FE
+local function tweenGrip(tool, newGrip)
+    if not tool then return end
+    local tweenInfo = TweenInfo.new(0.05, Enum.EasingStyle.Linear)
+    pcall(function()
+        TweenService:Create(tool, tweenInfo, {Grip = newGrip}):Play()
+    end)
+
+    local char = player.Character
+    local humanoid = char and char:FindFirstChildOfClass("Humanoid")
+    if humanoid and tool and tool.Parent == char then
+        if not getgenv()._lastForceEquip or tick() - getgenv()._lastForceEquip > 0.03 then
+            getgenv()._lastForceEquip = tick()
+            pcall(function() humanoid:EquipTool(tool) end)
+        end
+    end
+end
+
+-- === UI ===
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 350, 0, 280)
+mainFrame.Size = UDim2.new(0, 350, 0, 320)
 mainFrame.Position = UDim2.new(0.02, 0, 0.03, 0)
 mainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 mainFrame.BorderSizePixel = 1
 mainFrame.BorderColor3 = Color3.fromRGB(120, 120, 120)
 mainFrame.Parent = gui
-
-local corner = Instance.new("UICorner", mainFrame)
-corner.CornerRadius = UDim.new(0, 6)
-
+local mainCorner = Instance.new("UICorner", mainFrame)
+mainCorner.CornerRadius = UDim.new(0, 6)
 CenterModule:EnableDragFrame(mainFrame)
 
 local minimizedCube = Instance.new("TextButton")
@@ -124,26 +161,25 @@ local cubeCorner = Instance.new("UICorner", minimizedCube)
 cubeCorner.CornerRadius = UDim.new(0, 4)
 CenterModule:EnableDragFrame(minimizedCube)
 
-local header = Instance.new("Frame")
+local header = Instance.new("Frame", mainFrame)
 header.Name = "Header"
 header.Size = UDim2.new(1, 0, 0, 30)
+header.Position = UDim2.new(0, 0, 0, 0)
 header.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-header.Parent = mainFrame
-
 local headerCorner = Instance.new("UICorner", header)
 headerCorner.CornerRadius = UDim.new(0, 6)
 
-local title = Instance.new("TextLabel")
+local title = Instance.new("TextLabel", header)
 title.Name = "Title"
 title.Size = UDim2.new(1, -30, 1, 0)
-title.Text = "Tool Tweaker"
+title.Position = UDim2.new(0, 5, 0, 0)
+title.Text = "Tool Tweaks"
 title.Font = Enum.Font.SourceSansBold
 title.TextSize = 16
 title.TextColor3 = Color3.fromRGB(240, 240, 240)
 title.BackgroundTransparency = 1
-title.Parent = header
 
-local minimizeButton = Instance.new("TextButton")
+local minimizeButton = Instance.new("TextButton", header)
 minimizeButton.Name = "MinimizeButton"
 minimizeButton.Size = UDim2.new(0, 30, 1, 0)
 minimizeButton.Position = UDim2.new(1, -30, 0, 0)
@@ -153,7 +189,6 @@ minimizeButton.TextSize = 16
 minimizeButton.TextColor3 = Color3.fromRGB(240, 240, 240)
 minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 minimizeButton.BackgroundTransparency = 0.85
-minimizeButton.Parent = header
 
 minimizeButton.MouseButton1Click:Connect(function()
     mainFrame.Visible = false
@@ -167,21 +202,21 @@ minimizedCube.MouseButton1Click:Connect(function()
     mainFrame.Visible = true
 end)
 
-local tabsContainer = Instance.new("Frame")
+-- Tabs
+local tabsContainer = Instance.new("Frame", mainFrame)
 tabsContainer.Name = "TabsContainer"
 tabsContainer.Size = UDim2.new(1, 0, 0, 30)
 tabsContainer.Position = UDim2.new(0, 0, 0, 30)
 tabsContainer.BackgroundTransparency = 1
-tabsContainer.Parent = mainFrame
 
 local tabLayout = Instance.new("UIListLayout", tabsContainer)
 tabLayout.FillDirection = Enum.FillDirection.Horizontal
 tabLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 tabLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
-tabLayout.Padding = UDim.new(0, 5)
+tabLayout.Padding = UDim.new(0, 6)
 
-local posButton = Instance.new("TextButton")
+local posButton = Instance.new("TextButton", tabsContainer)
 posButton.Name = "PositionTab"
 posButton.Size = UDim2.new(0, 100, 0, 25)
 posButton.Text = "Position"
@@ -189,11 +224,10 @@ posButton.Font = Enum.Font.SourceSansBold
 posButton.TextSize = 14
 posButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 posButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-posButton.Parent = tabsContainer
 local posCorner = Instance.new("UICorner", posButton)
 posCorner.CornerRadius = UDim.new(0, 4)
 
-local rotButton = Instance.new("TextButton")
+local rotButton = Instance.new("TextButton", tabsContainer)
 rotButton.Name = "RotationTab"
 rotButton.Size = UDim2.new(0, 100, 0, 25)
 rotButton.Text = "Rotation"
@@ -201,37 +235,47 @@ rotButton.Font = Enum.Font.SourceSansBold
 rotButton.TextSize = 14
 rotButton.TextColor3 = Color3.fromRGB(200, 200, 200)
 rotButton.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
-rotButton.Parent = tabsContainer
 local rotCorner = Instance.new("UICorner", rotButton)
 rotCorner.CornerRadius = UDim.new(0, 4)
 
-local pages = Instance.new("Frame")
+-- Freeze camera button later appended to tabsContainer
+local freezeButton = Instance.new("TextButton", tabsContainer)
+freezeButton.Name = "FreezeCameraButton"
+freezeButton.Size = UDim2.new(0, 110, 0, 25)
+freezeButton.Text = "Freeze Camera"
+freezeButton.Font = Enum.Font.SourceSansBold
+freezeButton.TextSize = 14
+freezeButton.TextColor3 = Color3.fromRGB(200, 200, 200)
+freezeButton.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+local freezeCorner = Instance.new("UICorner", freezeButton)
+freezeCorner.CornerRadius = UDim.new(0, 4)
+
+-- Pages
+local pages = Instance.new("Frame", mainFrame)
 pages.Name = "Pages"
-pages.Size = UDim2.new(1, -10, 1, -100)
+pages.Size = UDim2.new(1, -10, 1, -110)
 pages.Position = UDim2.new(0, 5, 0, 65)
 pages.BackgroundTransparency = 1
-pages.Parent = mainFrame
 
-local posPage = Instance.new("Frame")
+local posPage = Instance.new("Frame", pages)
 posPage.Name = "PositionPage"
 posPage.Size = UDim2.new(1, 0, 1, 0)
 posPage.BackgroundTransparency = 1
-posPage.Parent = pages
 local posPageLayout = Instance.new("UIListLayout", posPage)
 posPageLayout.Padding = UDim.new(0, 8)
 posPageLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-local rotPage = Instance.new("Frame")
+local rotPage = Instance.new("Frame", pages)
 rotPage.Name = "RotationPage"
 rotPage.Size = UDim2.new(1, 0, 1, 0)
 rotPage.BackgroundTransparency = 1
 rotPage.Visible = false
-rotPage.Parent = pages
 local rotPageLayout = Instance.new("UIListLayout", rotPage)
 rotPageLayout.Padding = UDim.new(0, 8)
 rotPageLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-local incrementInput = Instance.new("TextBox")
+-- Increment input
+local incrementInput = Instance.new("TextBox", mainFrame)
 incrementInput.Name = "IncrementInput"
 incrementInput.Size = UDim2.new(1, -10, 0, 30)
 incrementInput.Position = UDim2.new(0, 5, 1, -35)
@@ -241,10 +285,10 @@ incrementInput.PlaceholderText = "Increment Value"
 incrementInput.TextSize = 14
 incrementInput.TextColor3 = Color3.fromRGB(240, 240, 240)
 incrementInput.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-incrementInput.Parent = mainFrame
 local incCorner = Instance.new("UICorner", incrementInput)
 incCorner.CornerRadius = UDim.new(0, 4)
 
+-- Tab switching
 posButton.MouseButton1Click:Connect(function()
     posPage.Visible = true
     rotPage.Visible = false
@@ -265,43 +309,18 @@ rotButton.MouseButton1Click:Connect(function()
     incrementInput.Text = "1"
 end)
 
--- ✅ Add this function to the script above to replace the existing tweenGrip -- It now includes forced equip to replicate the Grip to other players (FE-compatible)
-
-local function tweenGrip(tool, newGrip) if not tool then return end
-
-local tweenInfo = TweenInfo.new(0.05, Enum.EasingStyle.Linear)
-local tween = TweenService:Create(tool, tweenInfo, {Grip = newGrip})
-tween:Play()
-
--- 🔁 FE Replication: Force Equip to update server-side grip
-local char = player.Character
-local humanoid = char and char:FindFirstChildOfClass("Humanoid")
-if humanoid and tool and tool.Parent == char then
-    if not getgenv()._lastForceEquip or tick() - getgenv()._lastForceEquip > 0.03 then
-        getgenv()._lastForceEquip = tick()
-        pcall(function()
-            humanoid:EquipTool(tool)
-        end)
-    end
-end
-
-end
-
-
-
+-- Create control rows
 local allSliders = {}
-
 local function createControlRow(parent, axis, axisColor)
-    local row = Instance.new("Frame")
+    local row = Instance.new("Frame", parent)
     row.Name = axis .. "Row"
     row.Size = UDim2.new(1, 0, 0, 50)
     row.BackgroundTransparency = 1
-    row.Parent = parent
 
     local rowLayout = Instance.new("UIListLayout", row)
     rowLayout.FillDirection = Enum.FillDirection.Horizontal
     rowLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-    rowLayout.Padding = UDim.new(0, 5)
+    rowLayout.Padding = UDim.new(0, 6)
 
     local label = Instance.new("TextLabel", row)
     label.Size = UDim2.new(0, 25, 0, 25)
@@ -313,11 +332,11 @@ local function createControlRow(parent, axis, axisColor)
 
     local minusButton = Instance.new("TextButton", row)
     minusButton.Name = "Minus"
-    minusButton.Size = UDim2.new(0, 25, 0, 25)
+    minusButton.Size = UDim2.new(0, 28, 0, 28)
     minusButton.Text = "-"
     minusButton.Font = Enum.Font.SourceSansBold
     minusButton.TextSize = 20
-    minusButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    minusButton.TextColor3 = Color3.fromRGB(255,255,255)
     minusButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
     local mB_c = Instance.new("UICorner", minusButton)
     mB_c.CornerRadius = UDim.new(0, 4)
@@ -335,11 +354,11 @@ local function createControlRow(parent, axis, axisColor)
 
     local plusButton = Instance.new("TextButton", row)
     plusButton.Name = "Plus"
-    plusButton.Size = UDim2.new(0, 25, 0, 25)
+    plusButton.Size = UDim2.new(0, 28, 0, 28)
     plusButton.Text = "+"
     plusButton.Font = Enum.Font.SourceSansBold
     plusButton.TextSize = 20
-    plusButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    plusButton.TextColor3 = Color3.fromRGB(255,255,255)
     plusButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
     local pB_c = Instance.new("UICorner", plusButton)
     pB_c.CornerRadius = UDim.new(0, 4)
@@ -373,21 +392,22 @@ local function createControlRow(parent, axis, axisColor)
         SliderTrack = sliderTrack,
         SliderThumb = sliderThumb
     }
-
 end
 
+-- Setup controls (buttons, input, slider)
 local function setupControls(controls, axis, isRotation)
-    
     local function applyChange(tool, change)
+        if not tool or not tool.Grip then return end
         local newGrip
         if isRotation then
-            local rotX, rotY, rotZ = tool.Grip:ToEulerAnglesXYZ()
-            
-            local newRotX = rotX + (axis == "X" and math.rad(change) or 0)
-            local newRotY = rotY + (axis == "Y" and math.rad(change) or 0)
-            local newRotZ = rotZ + (axis == "Z" and math.rad(change) or 0)
-
-            newGrip = CFrame.new(tool.Grip.Position) * CFrame.fromEulerAnglesXYZ(newRotX, newRotY, newRotZ)
+            -- Cumulative tracked rotation (degrees)
+            rotationTracker[axis] = rotationTracker[axis] + change
+            newGrip = CFrame.new(tool.Grip.Position) *
+                CFrame.fromEulerAnglesXYZ(
+                    math.rad(rotationTracker.X),
+                    math.rad(rotationTracker.Y),
+                    math.rad(rotationTracker.Z)
+                )
         else
             local pos = Vector3.new(
                 axis == "X" and change or 0,
@@ -395,7 +415,7 @@ local function setupControls(controls, axis, isRotation)
                 axis == "Z" and change or 0
             )
             local rx, ry, rz = tool.Grip:ToEulerAnglesXYZ()
-newGrip = CFrame.new(tool.Grip.Position + pos) * CFrame.fromEulerAnglesXYZ(rx, ry, rz)
+            newGrip = CFrame.new(tool.Grip.Position + pos) * CFrame.fromEulerAnglesXYZ(rx, ry, rz)
         end
         tweenGrip(tool, newGrip)
     end
@@ -430,35 +450,39 @@ newGrip = CFrame.new(tool.Grip.Position + pos) * CFrame.fromEulerAnglesXYZ(rx, r
     controls.Input.FocusLost:Connect(function(enterPressed)
         if enterPressed then
             local tool = CenterModule:GetCurrentTool()
-            if tool then
-                local value = tonumber(controls.Input.Text)
-                if value == nil then return end
+            if not tool or not tool.Grip then return end
+            local value = tonumber(controls.Input.Text)
+            if value == nil then return end
 
-                local pos, rotX, rotY, rotZ = tool.Grip.Position, tool.Grip:ToEulerAnglesXYZ()
-                
-                local newGrip
-                if isRotation then
-                    newGrip = CFrame.new(pos) * CFrame.fromEulerAnglesXYZ(
-                        axis == "X" and math.rad(value) or rotX,
-                        axis == "Y" and math.rad(value) or rotY,
-                        axis == "Z" and math.rad(value) or rotZ
-                    )
-                else
-                     newGrip = CFrame.new(
-                        axis == "X" and value or pos.X,
-                        axis == "Y" and value or pos.Y,
-                        axis == "Z" and value or pos.Z
-                    ) * tool.Grip.Rotation
-                end
+            local pos = tool.Grip.Position
+            local rx, ry, rz = tool.Grip:ToEulerAnglesXYZ()
+
+            if isRotation then
+                -- Set tracked rotation directly
+                rotationTracker[axis] = value
+                local newGrip = CFrame.new(pos) * CFrame.fromEulerAnglesXYZ(
+                    math.rad(rotationTracker.X),
+                    math.rad(rotationTracker.Y),
+                    math.rad(rotationTracker.Z)
+                )
+                tweenGrip(tool, newGrip)
+            else
+                local newGrip = CFrame.new(
+                    axis == "X" and value or pos.X,
+                    axis == "Y" and value or pos.Y,
+                    axis == "Z" and value or pos.Z
+                ) * CFrame.fromEulerAnglesXYZ(rx, ry, rz)
                 tweenGrip(tool, newGrip)
             end
         end
     end)
 
+    -- Slider dragging logic
     local thumb = controls.SliderThumb
     local track = controls.SliderTrack
     local dragConnection = nil
     local runServiceConnection = nil
+    local endConnection = nil
 
     thumb.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -472,64 +496,65 @@ newGrip = CFrame.new(tool.Grip.Position + pos) * CFrame.fromEulerAnglesXYZ(rx, r
                     end
                 end
 
-                dragConnection = UserInputService.InputChanged:Connect(function(input)
-                    if isSliderDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-                         local mouseX = input.Position.X
-                         local trackX = track.AbsolutePosition.X
-                         local trackWidth = track.AbsoluteSize.X
-
-                         local newThumbX = math.clamp(mouseX - trackX, 0, trackWidth)
-                         thumb.Position = UDim2.new(0, newThumbX - 9, 0.5, -9)
+                dragConnection = UserInputService.InputChanged:Connect(function(inputChanged)
+                    if isSliderDragging and (inputChanged.UserInputType == Enum.UserInputType.MouseMovement or inputChanged.UserInputType == Enum.UserInputType.Touch) then
+                        local mouseX = inputChanged.Position.X
+                        local trackX = track.AbsolutePosition.X
+                        local trackWidth = track.AbsoluteSize.X
+                        local newThumbX = math.clamp(mouseX - trackX, 0, trackWidth)
+                        thumb.Position = UDim2.new(0, newThumbX - 9, 0.5, -9)
                     end
                 end)
 
                 runServiceConnection = RunService.Heartbeat:Connect(function(dt)
                     local tool = CenterModule:GetCurrentTool()
                     if tool and isSliderDragging then
-                        -- New, corrected change rate logic based on mouse position
                         local mouseX = UserInputService:GetMouseLocation().X
                         local trackX = track.AbsolutePosition.X
                         local trackWidth = track.AbsoluteSize.X
-
                         local relativeMouseX = mouseX - trackX
-                        local normalizedPos = math.clamp(relativeMouseX / trackWidth, 0, 1)
-                        local changeRate = (normalizedPos - 0.5) * 2
-                        
+                        local normalizedPos = math.clamp(relativeMouseX / math.max(trackWidth, 1), 0, 1)
+                        local changeRate = (normalizedPos - 0.5) * 2 -- -1 to 1
                         local increment = math.abs(tonumber(incrementInput.Text) or (isRotation and 1 or 0.1))
                         local totalChange = changeRate * increment * 10 * dt
-
                         applyChange(tool, totalChange)
+                    end
+                end)
+
+                endConnection = UserInputService.InputEnded:Connect(function(inputEnded)
+                    if isSliderDragging and activeSliderThumb == thumb and (inputEnded.UserInputType == Enum.UserInputType.MouseButton1 or inputEnded.UserInputType == Enum.UserInputType.Touch) then
+                        -- cleanup
+                        isSliderDragging = false
+                        activeSliderThumb = nil
+
+                        for _, slider in pairs(allSliders) do
+                            slider.Thumb.Active = true
+                        end
+
+                        if runServiceConnection then
+                            runServiceConnection:Disconnect()
+                            runServiceConnection = nil
+                        end
+                        if dragConnection then
+                            dragConnection:Disconnect()
+                            dragConnection = nil
+                        end
+                        if endConnection then
+                            endConnection:Disconnect()
+                            endConnection = nil
+                        end
+
+                        local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad)
+                        local thumbTween = TweenService:Create(thumb, tweenInfo, {Position = UDim2.new(0.5, -9, 0.5, -9)})
+                        thumbTween:Play()
                     end
                 end)
             end
         end
     end)
-
-    UserInputService.InputEnded:Connect(function(input)
-         if isSliderDragging and activeSliderThumb == thumb and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-            isSliderDragging = false
-            activeSliderThumb = nil
-            
-            for _, slider in pairs(allSliders) do
-                slider.Thumb.Active = true
-            end
-            
-            if runServiceConnection then
-                runServiceConnection:Disconnect()
-                runServiceConnection = nil
-            end
-            if dragConnection then
-                dragConnection:Disconnect()
-                dragConnection = nil
-            end
-
-            local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad)
-            local tween = TweenService:Create(thumb, tweenInfo, {Position = UDim2.new(0.5, -9, 0.5, -9)})
-            tween:Play()
-        end
-    end)
 end
 
+-- Build controls
 local posControls = {
     X = createControlRow(posPage, "X", Color3.fromRGB(255, 75, 75)),
     Y = createControlRow(posPage, "Y", Color3.fromRGB(75, 255, 75)),
@@ -550,41 +575,11 @@ setupControls(rotControls.X, "X", true)
 setupControls(rotControls.Y, "Y", true)
 setupControls(rotControls.Z, "Z", true)
 
-RunService.RenderStepped:Connect(function()
-    local tool = CenterModule:GetCurrentTool()
-    if tool and mainFrame.Visible then
-        local pos = tool.Grip.Position
-        local rotX, rotY, rotZ = tool.Grip:ToEulerAnglesXYZ()
-
-        if posPage.Visible then
-            if not posControls.X.Input:IsFocused() then posControls.X.Input.Text = string.format("%.2f", pos.X) end
-            if not posControls.Y.Input:IsFocused() then posControls.Y.Input.Text = string.format("%.2f", pos.Y) end
-            if not posControls.Z.Input:IsFocused() then posControls.Z.Input.Text = string.format("%.2f", pos.Z) end
-        elseif rotPage.Visible then
-            if not rotControls.X.Input:IsFocused() then rotControls.X.Input.Text = string.format("%.1f", math.deg(rotX)) end
-            if not rotControls.Y.Input:IsFocused() then rotControls.Y.Input.Text = string.format("%.1f", math.deg(rotY)) end
-            if not rotControls.Z.Input:IsFocused() then rotControls.Z.Input.Text = string.format("%.1f", math.deg(rotZ)) end
-        end
-    end
-end)
-
+-- Camera freeze helpers
 local camera = workspace.CurrentCamera
-local freezeButton = Instance.new("TextButton")
-freezeButton.Name = "FreezeCameraButton"
-freezeButton.Size = UDim2.new(0, 100, 0, 25)
-freezeButton.Text = "Freeze Camera"
-freezeButton.Font = Enum.Font.SourceSansBold
-freezeButton.TextSize = 14
-freezeButton.TextColor3 = Color3.fromRGB(200, 200, 200)
-freezeButton.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
-freezeButton.LayoutOrder = 3
-freezeButton.Parent = tabsContainer
-local freezeCorner = Instance.new("UICorner", freezeButton)
-freezeCorner.CornerRadius = UDim.new(0, 4)
-
 local frozen = false
 local camPart = nil
-local conn
+local camConn = nil
 
 local function freezeCamera()
     local char = player.Character
@@ -601,7 +596,7 @@ local function freezeCamera()
 
     camera.CameraType = Enum.CameraType.Scriptable
 
-    conn = RunService.RenderStepped:Connect(function()
+    camConn = RunService.RenderStepped:Connect(function()
         if camPart then
             camera.CFrame = camPart.CFrame
         end
@@ -609,7 +604,7 @@ local function freezeCamera()
 end
 
 local function restoreCamera()
-    if conn then conn:Disconnect() conn = nil end
+    if camConn then camConn:Disconnect() camConn = nil end
     if camPart then camPart:Destroy() camPart = nil end
     camera.CameraType = Enum.CameraType.Custom
     local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
@@ -629,4 +624,32 @@ freezeButton.MouseButton1Click:Connect(function()
         freezeButton.TextColor3 = Color3.fromRGB(200, 200, 200)
     end
     frozen = not frozen
+end)
+
+-- Keep track of tool changes and update UI
+local currentToolRef = nil
+RunService.RenderStepped:Connect(function()
+    local tool = CenterModule:GetCurrentTool()
+    if tool ~= currentToolRef then
+        currentToolRef = tool
+        if tool then
+            -- sync rotation tracker to tool when new tool is detected
+            syncRotationWithTool(tool)
+        end
+    end
+
+    if tool and mainFrame.Visible then
+        local pos = tool.Grip.Position
+        local rotX, rotY, rotZ = tool.Grip:ToEulerAnglesXYZ()
+
+        if posPage.Visible then
+            if not posControls.X.Input:IsFocused() then posControls.X.Input.Text = string.format("%.2f", pos.X) end
+            if not posControls.Y.Input:IsFocused() then posControls.Y.Input.Text = string.format("%.2f", pos.Y) end
+            if not posControls.Z.Input:IsFocused() then posControls.Z.Input.Text = string.format("%.2f", pos.Z) end
+        elseif rotPage.Visible then
+            if not rotControls.X.Input:IsFocused() then rotControls.X.Input.Text = string.format("%.1f", rotationTracker.X) end
+            if not rotControls.Y.Input:IsFocused() then rotControls.Y.Input.Text = string.format("%.1f", rotationTracker.Y) end
+            if not rotControls.Z.Input:IsFocused() then rotControls.Z.Input.Text = string.format("%.1f", rotationTracker.Z) end
+        end
+    end
 end)
