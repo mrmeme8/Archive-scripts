@@ -1,8 +1,9 @@
 --[[
 🐾 Pet Team Universal (Corrected Version)
-Equip + Save/Load Teams + Rename/Delete + Preview Toggle + Last Session Save
+Equip + Save/Load Teams + Rename/Delete + Preview Toggle
 Original by: MrMeme8 | Code: ChatDev
 Improved by: G
+Modification: Auto-tracking for manual equips and workspace pets by Gemini
 --]]
 
 -- Services
@@ -11,6 +12,7 @@ local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
+local workspace = game:GetService("Workspace")
 
 -- Service Fallback for Executor Environments
 local function getService(serviceName)
@@ -33,10 +35,15 @@ PetTeamManager.__index = PetTeamManager
 -- Configuration (Easy to edit)
 local CONFIG = {
     SAVE_FILE = "PetTeams.json",
-    LAST_SESSION_FILE = "LastSession.json",
     MAX_PETS = 8,
     EQUIP_DELAY = 0.05,
     NOTIFY_DURATION = 2.5,
+    AUTO_TRACK_MANUAL_EQUIPS = true, -- Automatically detect pets equipped/unequipped outside the script.
+    SCAN_WORKSPACE_FOR_ACTIVE_PETS = true, -- Scan the entire workspace for existing pets
+    PET_FORMATION = {
+        Radius = 4,
+        VerticalOffset = 1
+    },
     UI = {
         Title = "🐾 Pet Team Universal",
         Font = Enum.Font.SourceSansBold,
@@ -51,7 +58,7 @@ local CONFIG = {
             Warning = Color3.fromRGB(200, 150, 0),
             Info = Color3.fromRGB(0, 90, 180),
         },
-        InitialSize = Vector2.new(550, 340)
+        InitialSize = Vector2.new(550, 420)
     }
 }
 
@@ -64,11 +71,15 @@ local function CreateElement(className, properties)
     return element
 end
 
+-- Helper function to check if a string is a UUID (matches the format {8-4-4-4-12})
+local function isUUID(str)
+    return type(str) == "string" and string.match(str, "^{%x%x%x%x%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%x%x%x%x%x%x%x%x}$") ~= nil
+end
+
 -- State
 PetTeamManager.equippedPets = {}
-PetTeamManager.selectedPets = {} -- Using a dictionary for faster lookups: { [uuid] = true }
+PetTeamManager.selectedPets = {}
 PetTeamManager.TeamsData = {}
-PetTeamManager.lastSessionPets = {}
 PetTeamManager.previewVisible = true
 PetTeamManager.autoSaveEnabled = true
 PetTeamManager.isMinimized = false
@@ -79,73 +90,65 @@ PetTeamManager.isMinimized = false
 function PetTeamManager:LoadTeams()
     local data
     if isfile and isfile(CONFIG.SAVE_FILE) then
-        local success, result = pcall(function()
-            return HttpService:JSONDecode(readfile(CONFIG.SAVE_FILE))
-        end)
-        if success and type(result) == "table" then
-            data = result
-        end
+        local success, result = pcall(function() return HttpService:JSONDecode(readfile(CONFIG.SAVE_FILE)) end)
+        if success and type(result) == "table" then data = result end
     end
-    if not data and getgenv().PetTeams then
-        data = getgenv().PetTeams
-    end
+    if not data and getgenv().PetTeams then data = getgenv().PetTeams end
     self.TeamsData = data or {}
 end
 
 function PetTeamManager:SaveTeams()
     if not self.autoSaveEnabled then return end
     getgenv().PetTeams = self.TeamsData
-    local success, encodedData = pcall(function()
-        return HttpService:JSONEncode(self.TeamsData)
-    end)
-    if success and writefile then
-        writefile(CONFIG.SAVE_FILE, encodedData)
-    end
-end
-
-function PetTeamManager:LoadLastSession()
-    local data
-    if isfile and isfile(CONFIG.LAST_SESSION_FILE) then
-        local success, result = pcall(function()
-            return HttpService:JSONDecode(readfile(CONFIG.LAST_SESSION_FILE))
-        end)
-        if success and type(result) == "table" then
-            data = result
-        end
-    end
-    if not data and getgenv().LastSessionPets then
-        data = getgenv().LastSessionPets
-    end
-    self.lastSessionPets = data or {}
-end
-
-function PetTeamManager:SaveLastSession()
-    if not self.autoSaveEnabled then return end
-    getgenv().LastSessionPets = self.equippedPets
-    local success, encodedData = pcall(function()
-        return HttpService:JSONEncode(self.equippedPets)
-    end)
-    if success and writefile then
-        writefile(CONFIG.LAST_SESSION_FILE, encodedData)
-    end
+    local success, encodedData = pcall(function() return HttpService:JSONEncode(self.TeamsData) end)
+    if success and writefile then writefile(CONFIG.SAVE_FILE, encodedData) end
 end
 
 ---
 --- 🔍 Core Logic
 ---
+
+-- Scans the player's character model for any equipped pets.
+function PetTeamManager:ScanForEquippedPets()
+    local foundPetUuids = {}
+    local character = player.Character
+    if not character then return {} end
+
+    for _, descendant in ipairs(character:GetDescendants()) do
+        local uuid = descendant:GetAttribute("PET_UUID")
+        if uuid and descendant:IsA("Model") then
+            table.insert(foundPetUuids, uuid)
+        end
+    end
+    return foundPetUuids
+end
+
+-- Scans the workspace.PetsPhysical folder for existing pets, using any descendant model's name as the UUID
+function PetTeamManager:ScanForActivePets()
+    local foundPetUuids = {}
+    local petsPhysicalFolder = workspace:FindFirstChild("PetsPhysical") 
+    if petsPhysicalFolder then
+        -- Iterate through all descendants of PetsPhysical
+        for _, descendant in ipairs(petsPhysicalFolder:GetDescendants()) do
+            -- Check if the descendant is a Model and its name looks like a UUID
+            if descendant:IsA("Model") and isUUID(descendant.Name) then
+                table.insert(foundPetUuids, descendant.Name)
+            end
+        end
+    end
+    return foundPetUuids
+end
+
 function PetTeamManager:GetPetToolsByName(prefix)
     local results = {}
     local containers = { player.Backpack, player.Character }
     prefix = prefix:lower()
-
     for _, container in ipairs(containers) do
         if not container then continue end
         for _, tool in ipairs(container:GetChildren()) do
             if tool:IsA("Tool") and tool.Name:lower():find(prefix, 1, true) then
                 local id = tool:GetAttribute("PET_UUID")
-                if id then
-                    table.insert(results, { id = id, name = tool.Name })
-                end
+                if id then table.insert(results, { id = id, name = tool.Name }) end
             end
         end
     end
@@ -153,32 +156,91 @@ function PetTeamManager:GetPetToolsByName(prefix)
     return results
 end
 
+local function FindAndPositionPet(pet_uuid, targetCFrame)
+    local character = player.Character
+    if not character then return end
+    local petModel
+    for i = 1, 20 do
+        for _, descendant in ipairs(character:GetDescendants()) do
+            if descendant:GetAttribute("PET_UUID") == pet_uuid and descendant:IsA("Model") then
+                petModel = descendant
+                break
+            end
+        end
+        if petModel then break end
+        task.wait(0.05)
+    end
+    if petModel then
+        local primaryPart = petModel.PrimaryPart or petModel:FindFirstChild("HumanoidRootPart")
+        if primaryPart then
+            TweenService:Create(primaryPart, TweenInfo.new(0.2), {CFrame = targetCFrame}):Play()
+        end
+    else
+        warn("[PetTeam] Could not find equipped pet model with UUID: " .. tostring(pet_uuid) .. " to reposition.")
+    end
+end
+
+-- Original EquipPets function, now wrapped
+local originalEquipPets = PetTeamManager.EquipPets
 function PetTeamManager:EquipPets(petsToEquip)
+    local character = player.Character
+    local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+
+    if not rootPart then
+        self:Notify("Player character not found! Cannot equip.", CONFIG.UI.Colors.Error)
+        return
+    end
+
+    local radius = tonumber(self.UI.RadiusBox.Text) or CONFIG.PET_FORMATION.Radius
+    local verticalOffset = tonumber(self.UI.OffsetYBox.Text) or CONFIG.PET_FORMATION.VerticalOffset
+
+    local totalPets = #petsToEquip
+    local baseCFrame = rootPart.CFrame
+
+    for i, id in ipairs(petsToEquip) do
+        local angle = (i - 1) * (2 * math.pi / totalPets)
+        local offsetX = radius * math.cos(angle)
+        local offsetZ = radius * math.sin(angle)
+        local offsetY = verticalOffset
+
+        local petWorldPosition = baseCFrame:ToWorldSpace(CFrame.new(offsetX, offsetY, offsetZ)).Position
+        local playerFocusPosition = baseCFrame.Position
+        local lookAtPosition = Vector3.new(playerFocusPosition.x, petWorldPosition.y, playerFocusPosition.z)
+        local targetCFrame = CFrame.new(petWorldPosition, lookAtPosition)
+
+        PetsService:FireServer("EquipPet", id, targetCFrame)
+
+        task.spawn(FindAndPositionPet, id, targetCFrame)
+        task.wait(CONFIG.EQUIP_DELAY)
+    end
+    -- Update the equippedPets list based on the new equips
     for _, id in ipairs(petsToEquip) do
-        PetsService:FireServer("EquipPet", id, CFrame.new(42, 0, 58))
         if not table.find(self.equippedPets, id) then
             table.insert(self.equippedPets, id)
         end
-        task.wait(CONFIG.EQUIP_DELAY)
     end
-    self:SaveLastSession() -- Save equipped pets after action
 end
 
+-- Original UnequipPets function, now wrapped
+local originalUnequipPets = PetTeamManager.UnequipPets
 function PetTeamManager:UnequipPets(petsToUnequip)
-    local remainingEquipped = {}
     local unequipSet = {}
     for _, id in ipairs(petsToUnequip) do unequipSet[id] = true end
+    
+    -- Fire the unequip for all pets to unequip
+    for _, id in ipairs(petsToUnequip) do
+        PetsService:FireServer("UnequipPet", id)
+        task.wait(CONFIG.EQUIP_DELAY)
+    end
 
+    -- Update the internal list of equipped pets
+    local newEquipped = {}
     for _, id in ipairs(self.equippedPets) do
-        if unequipSet[id] then
-            PetsService:FireServer("UnequipPet", id)
-            task.wait(CONFIG.EQUIP_DELAY)
-        else
-            table.insert(remainingEquipped, id)
+        if not unequipSet[id] then
+            table.insert(newEquipped, id)
         end
     end
-    self.equippedPets = remainingEquipped
-    self:SaveLastSession() -- Save equipped pets after action
+    self.equippedPets = newEquipped
 end
 
 ---
@@ -190,11 +252,11 @@ function PetTeamManager:Notify(message, color, duration)
     label.Text = message
     label.BackgroundColor3 = color or CONFIG.UI.Colors.Header
     label.Visible = true
-    TweenService:Create(label, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { TextTransparency = 0, BackgroundTransparency = 0.1 }):Play()
+    TweenService:Create(label, TweenInfo.new(0.3), { TextTransparency = 0, BackgroundTransparency = 0.1 }):Play()
     if self.notifyDebounce then task.cancel(self.notifyDebounce) end
     self.notifyDebounce = task.delay(duration or CONFIG.NOTIFY_DURATION, function()
         if label and label.Parent then
-            TweenService:Create(label, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { TextTransparency = 1, BackgroundTransparency = 1 }):Play()
+            TweenService:Create(label, TweenInfo.new(0.5), { TextTransparency = 1, BackgroundTransparency = 1 }):Play()
         end
     end)
 end
@@ -203,9 +265,7 @@ function PetTeamManager:RefreshPreview()
     if not self.previewVisible then return end
     local container = self.UI.PreviewList
     container.CanvasPosition = Vector2.zero
-    for _, child in ipairs(container:GetChildren()) do
-        if child:IsA("GuiObject") then child:Destroy() end
-    end
+    for _, child in ipairs(container:GetChildren()) do if child:IsA("GuiObject") then child:Destroy() end end
     local prefix = self.UI.PetNameBox.Text
     local pets = self:GetPetToolsByName(prefix)
     for _, pet in ipairs(pets) do
@@ -232,9 +292,7 @@ end
 function PetTeamManager:RefreshTeams()
     local container = self.UI.TeamList
     container.CanvasPosition = Vector2.zero
-    for _, child in ipairs(container:GetChildren()) do
-        if child:IsA("Frame") then child:Destroy() end
-    end
+    for _, child in ipairs(container:GetChildren()) do if child:IsA("Frame") then child:Destroy() end end
     local teamNames = {}; for name in pairs(self.TeamsData) do table.insert(teamNames, name) end
     table.sort(teamNames)
     for i, teamName in ipairs(teamNames) do
@@ -245,15 +303,7 @@ function PetTeamManager:RefreshTeams()
         local unBtn = CreateElement("TextButton", { Parent = row, Size = UDim2.new(0, 28, 1, 0), Text = "📥", BackgroundColor3 = CONFIG.UI.Colors.Warning, TextColor3 = CONFIG.UI.Colors.Text, Font = CONFIG.UI.Font, TextScaled = true, LayoutOrder = 2 })
         local rnBtn = CreateElement("TextButton", { Parent = row, Size = UDim2.new(0, 28, 1, 0), Text = "📝", BackgroundColor3 = CONFIG.UI.Colors.Info, TextColor3 = CONFIG.UI.Colors.Text, Font = CONFIG.UI.Font, TextScaled = true, LayoutOrder = 3 })
         local delBtn = CreateElement("TextButton", { Parent = row, Size = UDim2.new(0, 28, 1, 0), Text = "🗑", BackgroundColor3 = CONFIG.UI.Colors.Error, TextColor3 = CONFIG.UI.Colors.Text, Font = CONFIG.UI.Font, TextScaled = true, LayoutOrder = 4 })
-        
-        -- FIX: Unequip current pets before equipping the new team's pets
-        eqBtn.MouseButton1Click:Connect(function()
-            self:UnequipPets(self.equippedPets)
-            self.equippedPets = {}
-            self:EquipPets(pets)
-            self:Notify("Equipped team: " .. teamName, CONFIG.UI.Colors.Success)
-        end)
-        
+        eqBtn.MouseButton1Click:Connect(function() self:UnequipPets(self.equippedPets); self.equippedPets = {}; self:EquipPets(pets); self:Notify("Equipped team: " .. teamName, CONFIG.UI.Colors.Success) end)
         unBtn.MouseButton1Click:Connect(function() self:UnequipPets(pets); self:Notify("Unequipped team: " .. teamName, CONFIG.UI.Colors.Warning) end)
         delBtn.MouseButton1Click:Connect(function() self.TeamsData[teamName] = nil; self:SaveTeams(); self:RefreshTeams(); self:Notify("Deleted team: " .. teamName, CONFIG.UI.Colors.Error) end)
         rnBtn.MouseButton1Click:Connect(function()
@@ -291,10 +341,16 @@ function PetTeamManager:Init()
     
     self.UI.PetNameBox = CreateElement("TextBox", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), PlaceholderText = "Filter by Pet Name", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Secondary, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 1 })
     self.UI.NumberBox = CreateElement("TextBox", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), PlaceholderText = "Equip Count (e.g., 4)", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Secondary, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, Text = tostring(CONFIG.MAX_PETS), LayoutOrder = 2 })
-    local loadLastSessionBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "▶ Load Last Session", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Primary, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 3 })
-    local equipBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "Equip Filtered/Selected", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Success, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 4 })
-    local unequipAllBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "Unequip All", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Error, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 5 })
-    local togglePreviewBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "👁 Preview: ON", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Success, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 6 })
+    
+    CreateElement("TextLabel", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 18), Text = "  Formation Radius:", Font = Enum.Font.SourceSans, TextColor3 = CONFIG.UI.Colors.Text, TextXAlignment = Enum.TextXAlignment.Left, BackgroundTransparency = 1, LayoutOrder = 3 })
+    self.UI.RadiusBox = CreateElement("TextBox", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 25), Text = tostring(CONFIG.PET_FORMATION.Radius), PlaceholderText = "e.g., 4", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Secondary, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 4 })
+    
+    CreateElement("TextLabel", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 18), Text = "  Vertical Offset:", Font = Enum.Font.SourceSans, TextColor3 = CONFIG.UI.Colors.Text, TextXAlignment = Enum.TextXAlignment.Left, BackgroundTransparency = 1, LayoutOrder = 5 })
+    self.UI.OffsetYBox = CreateElement("TextBox", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 25), Text = tostring(CONFIG.PET_FORMATION.VerticalOffset), PlaceholderText = "e.g., 1", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Secondary, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 6 })
+
+    local equipBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "Equip Filtered/Selected", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Success, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 7 })
+    local unequipAllBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "Unequip All", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Error, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 8 })
+    local togglePreviewBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "👁 Preview: ON", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Success, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 9 })
     
     self.UI.PreviewList = CreateElement("ScrollingFrame", { Parent = midCol, Size = UDim2.new(1, 0, 1, 0), BackgroundColor3 = CONFIG.UI.Colors.Primary, ScrollBarThickness = 8, CanvasSize = UDim2.new(), BorderSizePixel = 0 }); CreateElement("UICorner", { Parent = self.UI.PreviewList }); CreateElement("UIListLayout", { Parent = self.UI.PreviewList, Padding = UDim.new(0, 2), SortOrder = Enum.SortOrder.Name })
 
@@ -303,9 +359,115 @@ function PetTeamManager:Init()
     local saveTeamBtn = CreateElement("TextButton", { Parent = teamContainer, Size = UDim2.new(1, 0, 0, 30), Position = UDim2.new(0, 0, 1, -35), Text = "Save Selected as Team", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Success, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true })
     CreateElement("TextLabel", { Parent = teamContainer, Size = UDim2.new(1, 0, 0, 30), Position = UDim2.new(-1.65, 0, 1, 0), AnchorPoint = Vector2.new(0.5, 1), Text = "[UI MrMeme8] [System ChatDev] [Improvements G]", BackgroundTransparency = 1, TextColor3 = Color3.fromRGB(180, 180, 180), Font = Enum.Font.SourceSansItalic, TextScaled = true })
 
-    self.UI.NotificationLabel = CreateElement("TextLabel", { Parent = self.UI.ScreenGui, Size = UDim2.new(0, 320, 0, 45), Position = UDim2.new(0.5, -160, 0.85, 0), BackgroundColor3 = CONFIG.UI.Colors.Header, BackgroundTransparency = 1, TextColor3 = CONFIG.UI.Colors.Text, TextTransparency = 1, Font = CONFIG.UI.Font, TextScaled = true, Visible = false, ZIndex = 10 }); CreateElement("UICorner", { Parent = self.UI.NotificationLabel })
+    self.UI.NotificationLabel = CreateElement("TextLabel", { Parent = self.UI.ScreenGui, Size = UDim2.new(0, 320, 0, 45), Position = UDim2.new(0.5, -160, 0.75, 0), BackgroundColor3 = CONFIG.UI.Colors.Header, BackgroundTransparency = 1, TextColor3 = CONFIG.UI.Colors.Text, TextTransparency = 1, Font = CONFIG.UI.Font, TextScaled = true, Visible = false, ZIndex = 10 }); CreateElement("UICorner", { Parent = self.UI.NotificationLabel })
 
-    self:LoadTeams(); self:LoadLastSession(); self:RefreshTeams(); self:RefreshPreview()
+    self:LoadTeams(); self:RefreshTeams(); self:RefreshPreview()
+
+    if CONFIG.AUTO_TRACK_MANUAL_EQUIPS then
+        local processingPets = {}
+
+        local function setupCharacterListeners(character)
+            if not character then return end
+
+            character.DescendantAdded:Connect(function(descendant)
+                local uuid = descendant:GetAttribute("PET_UUID")
+                if uuid and descendant:IsA("Model") and not processingPets[uuid] then
+                    if not table.find(self.equippedPets, uuid) then
+                        table.insert(self.equippedPets, uuid)
+                        self:Notify("Tracked a manually equipped pet.", CONFIG.UI.Colors.Info)
+                    end
+                end
+            end)
+
+            character.DescendantRemoving:Connect(function(descendant)
+                local uuid = descendant:GetAttribute("PET_UUID")
+                if uuid and descendant:IsA("Model") and not processingPets[uuid] then
+                    local index = table.find(self.equippedPets, uuid)
+                    if index then
+                        table.remove(self.equippedPets, index)
+                        self:Notify("A manually equipped pet was removed.", CONFIG.UI.Colors.Warning)
+                    end
+                end
+            end)
+        end
+        
+        -- Override EquipPets to flag pets during its operation
+        local original_EquipPets = PetTeamManager.EquipPets
+        function PetTeamManager:EquipPets(petsToEquip)
+            for _, id in ipairs(petsToEquip) do
+                processingPets[id] = true
+            end
+            original_EquipPets(self, petsToEquip)
+            task.delay(1, function()
+                for _, id in ipairs(petsToEquip) do
+                    processingPets[id] = nil
+                end
+            end)
+        end
+
+        -- Override UnequipPets to flag pets during its operation
+        local original_UnequipPets = PetTeamManager.UnequipPets
+        function PetTeamManager:UnequipPets(petsToUnequip)
+            for _, id in ipairs(petsToUnequip) do
+                processingPets[id] = true
+            end
+            original_UnequipPets(self, petsToUnequip)
+            task.delay(1, function()
+                for _, id in ipairs(petsToUnequip) do
+                    processingPets[id] = nil
+                end
+            end)
+        end
+
+        -- Perform initial scans
+        task.wait(1)
+        -- Start with pets on the character
+        self.equippedPets = self:ScanForEquippedPets()
+        
+        -- Add pets from workspace.PetsPhysical
+        if CONFIG.SCAN_WORKSPACE_FOR_ACTIVE_PETS then
+            local activeWorkspacePets = self:ScanForActivePets()
+            for _, id in ipairs(activeWorkspacePets) do
+                if not table.find(self.equippedPets, id) then
+                    table.insert(self.equippedPets, id)
+                end
+            end
+        end
+
+        if #self.equippedPets > 0 then
+            self:Notify(string.format("Found and tracking %d equipped pet(s).", #self.equippedPets), CONFIG.UI.Colors.Info)
+        end
+
+        -- Set up listeners for current and future characters
+        if player.Character then setupCharacterListeners(player.Character) end
+        player.CharacterAdded:Connect(setupCharacterListeners)
+        
+        -- New listener for pets added to the workspace
+        if CONFIG.SCAN_WORKSPACE_FOR_ACTIVE_PETS then
+            local petsPhysicalFolder = workspace:FindFirstChild("PetsPhysical")
+            if petsPhysicalFolder then
+                petsPhysicalFolder.DescendantAdded:Connect(function(descendant)
+                    if descendant:IsA("Model") and isUUID(descendant.Name) and not processingPets[descendant.Name] then
+                        local uuid = descendant.Name
+                        if not table.find(self.equippedPets, uuid) then
+                            table.insert(self.equippedPets, uuid)
+                            self:Notify("Tracked a newly active pet in workspace.", CONFIG.UI.Colors.Info)
+                        end
+                    end
+                end)
+                petsPhysicalFolder.DescendantRemoving:Connect(function(descendant)
+                    if descendant:IsA("Model") and isUUID(descendant.Name) and not processingPets[descendant.Name] then
+                         local uuid = descendant.Name
+                         local index = table.find(self.equippedPets, uuid)
+                        if index then
+                            table.remove(self.equippedPets, index)
+                            self:Notify("An active pet was removed from the workspace.", CONFIG.UI.Colors.Warning)
+                        end
+                    end
+                end)
+            end
+        end
+    end
 
     minimizeBtn.MouseButton1Click:Connect(function()
         self.isMinimized = not self.isMinimized
@@ -316,40 +478,52 @@ function PetTeamManager:Init()
     togglePreviewBtn.MouseButton1Click:Connect(function()
         self.previewVisible = not self.previewVisible
         midCol.Visible = self.previewVisible
-        togglePreviewBtn.Text = self.previewVisible and "🌕 Preview: ON" or "🌑 Preview: OFF"
+        togglePreviewBtn.Text = self.previewVisible and "👁 Preview: ON" or "🌑 Preview: OFF"
         togglePreviewBtn.BackgroundColor3 = self.previewVisible and CONFIG.UI.Colors.Success or CONFIG.UI.Colors.Error
         if self.previewVisible then self:RefreshPreview() end
     end)
     self.UI.PetNameBox:GetPropertyChangedSignal("Text"):Connect(function() self:RefreshPreview() end)
 
-    loadLastSessionBtn.MouseButton1Click:Connect(function()
-        if #self.lastSessionPets > 0 then
-            self:UnequipPets(self.equippedPets)
-            self.equippedPets = {}
-            self:EquipPets(self.lastSessionPets)
-            self:Notify(string.format("Loaded %d pets from your last session.", #self.lastSessionPets), CONFIG.UI.Colors.Info)
+    equipBtn.MouseButton1Click:Connect(function()
+        local numToEquip = tonumber(self.UI.NumberBox.Text) or CONFIG.MAX_PETS
+        numToEquip = math.clamp(numToEquip, 1, CONFIG.MAX_PETS)
+        local toEquip = {}
+
+        for id, _ in pairs(self.selectedPets) do
+            if #toEquip < numToEquip then
+                table.insert(toEquip, id)
+            end
+        end
+
+        if #toEquip < numToEquip then
+            local filteredPets = self:GetPetToolsByName(self.UI.PetNameBox.Text)
+            for _, pet in ipairs(filteredPets) do
+                if #toEquip >= numToEquip then break end
+                if not self.selectedPets[pet.id] then
+                    table.insert(toEquip, pet.id)
+                end
+            end
+        end
+
+        if #toEquip > 0 then
+            self:EquipPets(toEquip)
+            self:Notify(string.format("Equipped %d pet(s).", #toEquip), CONFIG.UI.Colors.Success)
         else
-            self:Notify("No last session pets found.", CONFIG.UI.Colors.Warning)
+            self:Notify("No pets found or selected to equip.", CONFIG.UI.Colors.Warning)
         end
     end)
 
-    equipBtn.MouseButton1Click:Connect(function()
-        local numToEquip = tonumber(self.UI.NumberBox.Text) or CONFIG.MAX_PETS; numToEquip = math.clamp(numToEquip, 1, CONFIG.MAX_PETS); local toEquip = {}
-        for id, _ in pairs(self.selectedPets) do if #toEquip < numToEquip then table.insert(toEquip, id) end end
-        if #toEquip < numToEquip then
-            local filteredPets = self:GetPetToolsByName(self.UI.PetNameBox.Text)
-            for _, pet in ipairs(filteredPets) do if #toEquip >= numToEquip then break end; if not self.selectedPets[pet.id] then table.insert(toEquip, pet.id) end end
-        end
-        if #toEquip > 0 then self:EquipPets(toEquip); self:Notify(string.format("Equipped %d pet(s).", #toEquip), CONFIG.UI.Colors.Success)
-        else self:Notify("No pets found or selected to equip.", CONFIG.UI.Colors.Warning) end
-    end)
     unequipAllBtn.MouseButton1Click:Connect(function()
-        if #self.equippedPets == 0 then self:Notify("No pets are currently equipped.", CONFIG.UI.Colors.Warning); return end
         local petsToUnequip = table.clone(self.equippedPets)
+        if #petsToUnequip == 0 then
+            self:Notify("No pets are currently equipped.", CONFIG.UI.Colors.Warning)
+            return
+        end
+        
         self:UnequipPets(petsToUnequip)
-        self.equippedPets = {}
         self:Notify(string.format("Unequipped %d pet(s).", #petsToUnequip), CONFIG.UI.Colors.Error)
     end)
+
     saveTeamBtn.MouseButton1Click:Connect(function()
         local selectedIds = {}; for id, _ in pairs(self.selectedPets) do table.insert(selectedIds, id) end
         if #selectedIds == 0 then self:Notify("Select pets in the preview list to save a team.", CONFIG.UI.Colors.Warning); return end
@@ -359,7 +533,7 @@ function PetTeamManager:Init()
             if enter and inputBox.Text:len() > 0 then
                 local teamName = inputBox.Text
                 if self.TeamsData[teamName] then self:Notify("A team with that name already exists.", CONFIG.UI.Colors.Error)
-                else self.TeamsData[teamName] = selectedIds; self:SaveTeams(); self:RefreshTeams(); self:Notify("Saved team: " .. teamName, CONFIG.UI.Colors.Success); self.selectedPets = {}; self:RefreshPreview() end
+                else self.TeamsData[inputBox.Text] = selectedIds; self:SaveTeams(); self:RefreshTeams(); self:Notify("Saved team: " .. teamName, CONFIG.UI.Colors.Success); self.selectedPets = {}; self:RefreshPreview() end
             end
             inputFrame:Destroy()
         end)
