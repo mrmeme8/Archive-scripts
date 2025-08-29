@@ -2,7 +2,7 @@
 🐾 Pet Team Universal (Final Refactored Version)
 All features included and working reliably.
 Original by: MrMeme8 | Code: ChatDev |
-Improvements & Refactoring: G & Gemini
+Improvements, Refactoring & Feature Additions: G
 --]]
 
 -- Services
@@ -13,6 +13,46 @@ local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local workspace = game:GetService("Workspace")
 
+--// SHOP DATA \\--
+local GameEvents = ReplicatedStorage:WaitForChild("GameEvents")
+
+local function getRemote(name)
+    local success, remote = pcall(function()
+        -- Use FindFirstChild, as WaitForChild can hang indefinitely if the object never appears
+        return GameEvents:FindFirstChild(name)
+    end)
+    if success and remote then
+        return remote
+    end
+    -- This message will appear in your executor's console if a remote is missing
+    warn("PetTeamUniversal: Could not find RemoteEvent: " .. name) 
+    return nil
+end
+
+local ShopData = {
+    Seed = {
+        Remote = getRemote("BuySeedStock"),
+        Items = {"Carrot", "Strawberry", "Blueberry", "Orange Tulip", "Tomato", "Corn", "Daffodil", "Watermelon", "Pumpkin", "Apple", "Bamboo", "Coconut", "Cactus", "Dragon Fruit", "Mango", "Grape", "Mushroom", "Pepper", "Cacao", "Beanstalk", "Ember Lily", "Sugar Apple", "Burning Bud", "Giant Pinecone", "Elder Strawberry", "Romanesco"}
+    },
+    Gear = {
+        Remote = getRemote("BuyGearStock"),
+        Items = {"Watering Can", "Trading Ticket", "Trowel", "Recall Wrench", "Basic Sprinkler", "Advanced Sprinkler", "Small Toy", "Medium Toy", "Small Treat", "Medium Treat", "Godly Sprinkler", "Lightning Rod", "Magnifying Glass", "Tanning Mirror", "Master Sprinkler", "Cleaning Spray", "Silver Fertilizer", "Gold Fertilizer", "Rainbow Fertilizer", "Favorite Tool", "Harvest Tool", "Friendship Pot", "Pet Pouch", "Grandmaster Sprinkler", "Levelup Lollipop", "Silver Lollipop", "Gold Lollipop", "Mega Lollipop", "Small Pet Size Boost", "Medium Pet Size Boost", "Garden Guide", "Plant Booster", "Pet Shard Tranquil", "Pet Shard Corrupted", "Pet Shard Fried", "Pet Shard Mega", "Pet Shard Aromatic", "Pet Shard Silver", "Pet Shard Golden", "Pet Shard Rainbow", "Cleansing Pet Shard", "Pet Shard GiantBean", "Tranquil Radar", "Corrupt Radar", "Mutation Spray Choc", "Mutation Spray Pollinated", "Mutation Spray Shocked", "Mutation Spray Chilled", "Mutation Spray Burnt", "Mutation Spray Cooked", "Mutation Spray HoneyGlazed", "Mutation Spray Fried", "Mutation Spray Cloudtouched", "Mutation Spray Wet", "Mutation Spray Windstruck", "Mutation Spray Verdant", "Mutation Spray Disco", "Mutation Spray Amber", "Mutation Spray Corrupt", "Mutation Spray Tranquil", "Mutation Spray Bloom", "Reclaimer"}
+    },
+    Egg = {
+        Remote = getRemote("BuyPetEgg"),
+        Items = {"Common Egg", "Uncommon Egg", "Rare Egg", "Legendary Egg", "Mythical Egg", "Bug Egg", "Common Summer Egg", "Rare Summer Egg", "Paradise Egg"}
+    },
+    Merchant = {
+        Remote = getRemote("BuyTravelingMerchantShopStock"),
+        Items = {"Common Gnome Crate", "Farmers Gnome Crate", "Classic Gnome Crate", "Iconic Gnome Crate", "Flower Seed Pack", "Honey Sprinkler", "Bee Egg", "Bee Crate", "Honey Crafters Crate", "Night Staff", "Star Caller", "Mutation Spray Cloudtouched", "Mutation Spray Wet", "Mutation Spray Windstruck", "Mutation Spray Verdant", "Tropical Mist Sprinkler", "Berry Blusher Sprinkler", "Spice Spritzer Sprinkler", "Sweet Soaker Sprinkler", "Flower Froster Sprinkler", "Stalk Sprout Sprinkler", "Cauliflower", "Rafflesia", "Green Apple", "Avocado", "Banana", "Pineapple", "Kiwi", "Bell Pepper", "Prickly Pear", "Loquat", "Feijoa", "Pitcher Plant", "Common Summer Egg", "Rare Summer Egg", "Paradise Egg"}
+    },
+    Event = {
+        Remote = getRemote("BuyEventShopStock"),
+        Items = {"Sprout Seed Pack", "Golden Goose Painting", "Bean Chair", "Giant Painting", "Sprout Egg", "Mandrake", "Sprout Crate", "Silver Fertilizer", "Canary Melon", "Amberheart", "Spriggan", "Skyroot Chest", "Griffin Statue", "Bouncy Mushroom", "Beanstalk Painting", "Can Of Beans", "Glowpod", "Flare Melon", "Pet Shard GiantBean", "Gnome"}
+    }
+}
+
+
 -- Service Fallback for Executor Environments
 local function getService(serviceName)
     local success, service = pcall(function()
@@ -21,7 +61,7 @@ local function getService(serviceName)
     return success and service
 end
 
-local PetsService = ReplicatedStorage and ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetsService")
+local PetsService = GameEvents:WaitForChild("PetsService")
 
 -- Player
 local player = Players.LocalPlayer
@@ -37,8 +77,9 @@ local DEFAULT_CONFIG = {
     MAX_PETS = 8,
     EQUIP_DELAY = 0.05,
     NOTIFY_DURATION = 2.5,
-    AUTO_REEQUIP_INTERVAL = 1.0, 
-    AUTO_TRACK_MANUAL_EQUIPS = true, 
+    REPEATED_BUY_INTERVAL = 0.5,
+    AUTO_REEQUIP_INTERVAL = 1.0,
+    AUTO_TRACK_MANUAL_EQUIPS = true,
     SCAN_WORKSPACE_FOR_ACTIVE_PETS = true,
     PET_FORMATION = {
         Radius = 4,
@@ -58,7 +99,7 @@ local DEFAULT_CONFIG = {
             Warning = Color3.fromRGB(200, 150, 0),
             Info = Color3.fromRGB(0, 90, 180),
         },
-        InitialSize = Vector2.new(550, 420) 
+        InitialSize = Vector2.new(550, 420)
     }
 }
 local CONFIG = table.clone(DEFAULT_CONFIG)
@@ -81,12 +122,13 @@ end
 PetTeamManager.equippedPets = {}
 PetTeamManager.selectedPets = {}
 PetTeamManager.TeamsData = {}
-PetTeamManager.QuickEquipTeam = {} 
+PetTeamManager.QuickEquipTeam = {}
 PetTeamManager.previewVisible = true
 PetTeamManager.autoSaveEnabled = true
 PetTeamManager.isMinimized = false
 PetTeamManager.autoReequipEnabled = false
 PetTeamManager.processingPets = {}
+PetTeamManager.activeToggles = {}
 PetTeamManager.currentView = "main"
 
 ---
@@ -99,7 +141,7 @@ function PetTeamManager:LoadTeams()
         if success and type(result) == "table" then fullData = result end
     end
     if not (fullData.Teams or fullData.QuickTeam) and getgenv().PetTeamData then fullData = getgenv().PetTeamData end
-    
+
     self.TeamsData = fullData.Teams or {}
     self.QuickEquipTeam = fullData.QuickTeam or {}
     local loadedSettings = fullData.Settings
@@ -116,6 +158,7 @@ function PetTeamManager:LoadTeams()
                 end
             end
         end
+        self.activeToggles = loadedSettings.ACTIVE_TOGGLES or {}
     end
 end
 
@@ -126,10 +169,10 @@ function PetTeamManager:SaveTeams()
         local success, result = pcall(function() return HttpService:JSONDecode(readfile(CONFIG.SAVE_FILE)) end)
         if success and type(result) == "table" then fullData = result end
     end
-    
+
     fullData.Teams = self.TeamsData
     fullData.QuickTeam = self.QuickEquipTeam
-    
+
     local success, encodedData = pcall(function() return HttpService:JSONEncode(fullData) end)
     if success and writefile then writefile(CONFIG.SAVE_FILE, encodedData) end
 end
@@ -146,13 +189,32 @@ function PetTeamManager:SaveSettings()
         MAX_PETS = CONFIG.MAX_PETS,
         EQUIP_DELAY = CONFIG.EQUIP_DELAY,
         NOTIFY_DURATION = CONFIG.NOTIFY_DURATION,
+        REPEATED_BUY_INTERVAL = CONFIG.REPEATED_BUY_INTERVAL,
         AUTO_REEQUIP_INTERVAL = CONFIG.AUTO_REEQUIP_INTERVAL,
         PET_FORMATION = {
             Radius = CONFIG.PET_FORMATION.Radius,
             VerticalOffset = CONFIG.PET_FORMATION.VerticalOffset
-        }
+        },
+        ACTIVE_TOGGLES = self.activeToggles
     }
-    
+
+    local success, encodedData = pcall(function() return HttpService:JSONEncode(fullData) end)
+    if success and writefile then writefile(CONFIG.SAVE_FILE, encodedData) end
+end
+
+function PetTeamManager:SaveToggleState()
+    if not self.autoSaveEnabled then return end
+    local fullData = {}
+    if isfile and isfile(CONFIG.SAVE_FILE) then
+        local success, result = pcall(function() return HttpService:JSONDecode(readfile(CONFIG.SAVE_FILE)) end)
+        if success and type(result) == "table" then fullData = result end
+    end
+    -- Ensure Settings table exists, preserving other settings
+    if not fullData.Settings then fullData.Settings = {} end
+
+    -- Only update the toggle states
+    fullData.Settings.ACTIVE_TOGGLES = self.activeToggles
+
     local success, encodedData = pcall(function() return HttpService:JSONEncode(fullData) end)
     if success and writefile then writefile(CONFIG.SAVE_FILE, encodedData) end
 end
@@ -165,16 +227,18 @@ function PetTeamManager:ResetSettings()
     end
 
     fullData.Settings = nil
-    
+
     local success, encodedData = pcall(function() return HttpService:JSONEncode(fullData) end)
     if success and writefile then writefile(CONFIG.SAVE_FILE, encodedData) end
 
     CONFIG.MAX_PETS = DEFAULT_CONFIG.MAX_PETS
     CONFIG.EQUIP_DELAY = DEFAULT_CONFIG.EQUIP_DELAY
     CONFIG.NOTIFY_DURATION = DEFAULT_CONFIG.NOTIFY_DURATION
+    CONFIG.REPEATED_BUY_INTERVAL = DEFAULT_CONFIG.REPEATED_BUY_INTERVAL
     CONFIG.AUTO_REEQUIP_INTERVAL = DEFAULT_CONFIG.AUTO_REEQUIP_INTERVAL
     CONFIG.PET_FORMATION.Radius = DEFAULT_CONFIG.PET_FORMATION.Radius
     CONFIG.PET_FORMATION.VerticalOffset = DEFAULT_CONFIG.PET_FORMATION.VerticalOffset
+    self.activeToggles = {}
 
     self:Notify("Settings have been reset to default.", CONFIG.UI.Colors.Warning)
 end
@@ -213,6 +277,43 @@ local function createSettingRow(parent, labelText, initialValue, layoutOrder)
     })
     return textBox
 end
+
+---
+--- 🛒 Shop Logic
+---
+function PetTeamManager:ToggleShopLoop(shopName, button)
+    if self.activeToggles[shopName] then
+        self.activeToggles[shopName] = nil -- Signal the loop to stop
+        button.BackgroundColor3 = CONFIG.UI.Colors.Primary
+        self:Notify(shopName .. " auto-buy STOPPED", CONFIG.UI.Colors.Error)
+    else
+        self.activeToggles[shopName] = true
+        button.BackgroundColor3 = CONFIG.UI.Colors.Success
+        self:Notify(shopName .. " auto-buy STARTED", CONFIG.UI.Colors.Success)
+        
+        task.spawn(function()
+            local shopInfo = ShopData[shopName]
+            if not (shopInfo and shopInfo.Remote) then
+                self:Notify(shopName .. " remote not found!", CONFIG.UI.Colors.Error)
+                self.activeToggles[shopName] = nil
+                button.BackgroundColor3 = CONFIG.UI.Colors.Primary
+                self:SaveToggleState()
+                return
+            end
+            
+            while self.activeToggles[shopName] do
+                for _, itemName in ipairs(shopInfo.Items) do
+                    if not self.activeToggles[shopName] then break end -- Check again before firing
+                    shopInfo.Remote:FireServer(itemName)
+                    task.wait(CONFIG.REPEATED_BUY_INTERVAL)
+                end
+                if not self.activeToggles[shopName] then break end -- Check after completing a full loop
+            end
+        end)
+    end
+    self:SaveToggleState() -- Save state whenever a toggle changes
+end
+
 
 ---
 --- 🔍 Core Logic
@@ -391,37 +492,61 @@ end
 function PetTeamManager:Init()
     local oldGui = PlayerGui:FindFirstChild("PetTeamUniversal") or CoreGui:FindFirstChild("PetTeamUniversal"); if oldGui then oldGui:Destroy() end
     self.UI = {}
+    self.UI.ShopToggleButtons = {}
     self.UI.ScreenGui = CreateElement("ScreenGui", { Name = "PetTeamUniversal", Parent = PlayerGui, ResetOnSpawn = false, ZIndexBehavior = Enum.ZIndexBehavior.Sibling })
     self.UI.MainFrame = CreateElement("Frame", { Name = "MainFrame", Parent = self.UI.ScreenGui, Size = UDim2.new(0, CONFIG.UI.InitialSize.X, 0, CONFIG.UI.InitialSize.Y), Position = UDim2.new(0.5, -CONFIG.UI.InitialSize.X / 2, 0.5, -CONFIG.UI.InitialSize.Y / 2), BackgroundColor3 = CONFIG.UI.Colors.Background, Active = true, Draggable = true })
     CreateElement("UICorner", { CornerRadius = UDim.new(0, 6), Parent = self.UI.MainFrame })
 
     local header = CreateElement("Frame", { Name = "Header", Parent = self.UI.MainFrame, Size = UDim2.new(1, 0, 0, 30), BackgroundColor3 = CONFIG.UI.Colors.Header })
-    local headerLayout = CreateElement("UIListLayout", {Parent = header, FillDirection = Enum.FillDirection.Horizontal, SortOrder = Enum.SortOrder.LayoutOrder, HorizontalAlignment = Enum.HorizontalAlignment.Right})
-    CreateElement("TextLabel", { Name = "Title", Parent = header, Size = UDim2.new(1, -60, 1, 0), BackgroundTransparency = 1, Font = CONFIG.UI.Font, Text = CONFIG.UI.Title, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 1 })
-    local settingsBtn = CreateElement("TextButton", { Name = "SettingsButton", Parent = header, Size = UDim2.new(0, 30, 1, 0), BackgroundTransparency = 1, Text = "⚙️", Font = CONFIG.UI.Font, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 2 })
-    local minimizeBtn = CreateElement("TextButton", { Name = "MinimizeButton", Parent = header, Size = UDim2.new(0, 30, 1, 0), BackgroundColor3 = CONFIG.UI.Colors.Secondary, Text = "−", Font = CONFIG.UI.Font, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 3 })
-    
-    local contentFrame = CreateElement("Frame", { Name = "Content", Parent = self.UI.MainFrame, Size = UDim2.new(1, -10, 1, -40), Position = UDim2.new(0.5, 0, 0, 35), AnchorPoint = Vector2.new(0.5, 0), BackgroundTransparency = 1 })
+    CreateElement("UIListLayout", {Parent = header, FillDirection = Enum.FillDirection.Horizontal, SortOrder = Enum.SortOrder.LayoutOrder, HorizontalAlignment = Enum.HorizontalAlignment.Right})
+    CreateElement("TextLabel", { Name = "Title", Parent = header, Size = UDim2.new(1, -120, 1, 0), BackgroundTransparency = 1, Font = CONFIG.UI.Font, Text = CONFIG.UI.Title, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 1 })
+    local featureBtn = CreateElement("TextButton", { Name = "FeatureButton", Parent = header, Size = UDim2.new(0, 30, 1, 0), BackgroundTransparency = 1, Text = "📜", Font = CONFIG.UI.Font, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 3 })
+    local contentBtn = CreateElement("TextButton", { Name = "ContentButton", Parent = header, Size = UDim2.new(0, 30, 1, 0), BackgroundTransparency = 1, Text = "📃", Font = CONFIG.UI.Font, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 2 })
+    local settingsBtn = CreateElement("TextButton", { Name = "SettingsButton", Parent = header, Size = UDim2.new(0, 30, 1, 0), BackgroundTransparency = 1, Text = "⚙️", Font = CONFIG.UI.Font, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 4 })
+    local minimizeBtn = CreateElement("TextButton", { Name = "MinimizeButton", Parent = header, Size = UDim2.new(0, 30, 1, 0), BackgroundColor3 = CONFIG.UI.Colors.Secondary, Text = "−", Font = CONFIG.UI.Font, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 5 })
 
+    local contentFrame = CreateElement("Frame", { Name = "Content", Parent = self.UI.MainFrame, Size = UDim2.new(1, -10, 1, -40), Position = UDim2.new(0.5, 0, 0, 35), AnchorPoint = Vector2.new(0.5, 0), BackgroundTransparency = 1, Visible = true })
+    local featurePanel = CreateElement("Frame", { Name = "FeaturePanel", Parent = self.UI.MainFrame, Size = UDim2.new(1, -10, 1, -40), Position = UDim2.new(0.5, 0, 0, 35), AnchorPoint = Vector2.new(0.5, 0), BackgroundColor3 = CONFIG.UI.Colors.Primary, Visible = false })
+    local settingsPanel = CreateElement("Frame", { Name = "SettingsPanel", Parent = self.UI.MainFrame, Size = UDim2.new(1, -10, 1, -40), Position = UDim2.new(0.5, 0, 0, 35), AnchorPoint = Vector2.new(0.5, 0), BackgroundColor3 = CONFIG.UI.Colors.Primary, BorderSizePixel = 0, Visible = false })
+    CreateElement("UICorner", { CornerRadius = UDim.new(0, 6), Parent = settingsPanel })
+    self.UI.SettingsPanel = settingsPanel
+
+    -- Feature Panel Content
+    local stockFrame = CreateElement("Frame", { Name = "Stock", Parent = featurePanel, Size = UDim2.new(0, 140, 1, -4), Position = UDim2.fromOffset(2, 2), BackgroundColor3 = Color3.new(1, 1, 1), BackgroundTransparency = 0.8 })
+    CreateElement("UIListLayout", { Parent = stockFrame, Padding = UDim.new(0, 10), HorizontalAlignment = Enum.HorizontalAlignment.Center, SortOrder = Enum.SortOrder.LayoutOrder })
+    CreateElement("TextLabel", { Parent = stockFrame, Size = UDim2.new(1, -12, 0, 42), Text = "TOGGLE", Font = CONFIG.UI.Font, TextColor3 = CONFIG.UI.Colors.Header, BackgroundTransparency = 1, TextScaled = true, LayoutOrder = 1 })
+    local seedBtn = CreateElement("TextButton", { Name = "SeedButton", Parent = stockFrame, Size = UDim2.new(1, -8, 0, 42), Text = "Seed", Font = CONFIG.UI.Font, TextColor3 = CONFIG.UI.Colors.Text, BackgroundColor3 = CONFIG.UI.Colors.Primary, TextScaled = true, LayoutOrder = 2 })
+    local gearBtn = CreateElement("TextButton", { Name = "GearButton", Parent = stockFrame, Size = UDim2.new(1, -8, 0, 42), Text = "Gear", Font = CONFIG.UI.Font, TextColor3 = CONFIG.UI.Colors.Text, BackgroundColor3 = CONFIG.UI.Colors.Primary, TextScaled = true, LayoutOrder = 3 })
+    local eggBtn = CreateElement("TextButton", { Name = "EggButton", Parent = stockFrame, Size = UDim2.new(1, -8, 0, 42), Text = "Egg", Font = CONFIG.UI.Font, TextColor3 = CONFIG.UI.Colors.Text, BackgroundColor3 = CONFIG.UI.Colors.Primary, TextScaled = true, LayoutOrder = 4 })
+    local merchantBtn = CreateElement("TextButton", { Name = "MerchantButton", Parent = stockFrame, Size = UDim2.new(1, -8, 0, 42), Text = "Merchant", Font = CONFIG.UI.Font, TextColor3 = CONFIG.UI.Colors.Text, BackgroundColor3 = CONFIG.UI.Colors.Primary, TextScaled = true, LayoutOrder = 5 })
+    local eventBtn = CreateElement("TextButton", { Name = "EventButton", Parent = stockFrame, Size = UDim2.new(1, -8, 0, 42), Text = "Event", Font = CONFIG.UI.Font, TextColor3 = CONFIG.UI.Colors.Text, BackgroundColor3 = CONFIG.UI.Colors.Primary, TextScaled = true, LayoutOrder = 6 })
+
+    self.UI.ShopToggleButtons["Seed"] = seedBtn
+    self.UI.ShopToggleButtons["Gear"] = gearBtn
+    self.UI.ShopToggleButtons["Egg"] = eggBtn
+    self.UI.ShopToggleButtons["Merchant"] = merchantBtn
+    self.UI.ShopToggleButtons["Event"] = eventBtn
+    
+    -- Content Panel Content (Original UI)
     local leftCol = CreateElement("Frame", { Name = "LeftColumn", Parent = contentFrame, Size = UDim2.new(0.33, -5, 1, 0), Position = UDim2.fromScale(0, 0), BackgroundTransparency = 1 }); CreateElement("UIListLayout", { Parent = leftCol, Padding = UDim.new(0, 5), SortOrder = Enum.SortOrder.LayoutOrder })
     local midCol = CreateElement("Frame", { Name = "MidColumn", Parent = contentFrame, Size = UDim2.new(0.33, -5, 1, 0), Position = UDim2.fromScale(0.33, 0), BackgroundTransparency = 1 })
     local rightCol = CreateElement("Frame", { Name = "RightColumn", Parent = contentFrame, Size = UDim2.new(0.33, 0, 1, 0), Position = UDim2.fromScale(0.66, 0), BackgroundTransparency = 1 }); CreateElement("UIListLayout", { Parent = rightCol, Padding = UDim.new(0, 5), SortOrder = Enum.SortOrder.LayoutOrder })
-    
+
     self.UI.PetNameBox = CreateElement("TextBox", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), PlaceholderText = "Filter by Pet Name", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Secondary, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 1 })
     self.UI.NumberBox = CreateElement("TextBox", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), PlaceholderText = "Equip Count (e.g., 4)", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Secondary, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, Text = tostring(CONFIG.MAX_PETS), LayoutOrder = 2 })
-    
+
     local equipBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "Equip Filtered/Selected", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Success, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 3 })
     local unequipAllBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "Unequip All", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Error, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 4 })
     local clearPreviewBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "🗑️ Clear Selected", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Warning, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 5 })
-    
+
     local quickEquipFrame = CreateElement("Frame", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), BackgroundTransparency = 1, LayoutOrder = 6 })
     CreateElement("UIListLayout", { Parent = quickEquipFrame, FillDirection = Enum.FillDirection.Horizontal, SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 5) })
     local quickEquipBtn = CreateElement("TextButton", { Parent = quickEquipFrame, Size = UDim2.new(1, -35, 1, 0), Text = "Quick Equip", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Info, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 1 })
     local saveQuickBtn = CreateElement("TextButton", { Parent = quickEquipFrame, Size = UDim2.new(0, 30, 1, 0), Text = "S", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Secondary, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 2 })
-    
+
     local autoReequipToggle = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 25), Text = "☐ Auto Re-Equip", Font = Enum.Font.SourceSans, BackgroundColor3 = CONFIG.UI.Colors.Secondary, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 7 })
     local togglePreviewBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "👁 Preview: ON", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Success, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 8 })
-    
+
     self.UI.PreviewList = CreateElement("ScrollingFrame", { Parent = midCol, Size = UDim2.new(1, 0, 1, 0), BackgroundColor3 = CONFIG.UI.Colors.Primary, ScrollBarThickness = 8, CanvasSize = UDim2.new(), BorderSizePixel = 0 }); CreateElement("UICorner", { Parent = self.UI.PreviewList }); CreateElement("UIListLayout", { Parent = self.UI.PreviewList, Padding = UDim.new(0, 2), SortOrder = Enum.SortOrder.Name })
 
     local copyAllPetsBtn = CreateElement("TextButton", { Parent = leftCol, Size = UDim2.new(1, 0, 0, 30), Text = "📋 Copy All Pets", Font = CONFIG.UI.Font, BackgroundColor3 = CONFIG.UI.Colors.Primary, TextColor3 = CONFIG.UI.Colors.Text, TextScaled = true, LayoutOrder = 9 })
@@ -433,17 +558,7 @@ function PetTeamManager:Init()
 
     self.UI.NotificationLabel = CreateElement("TextLabel", { Parent = self.UI.ScreenGui, Size = UDim2.new(0, 320, 0, 45), Position = UDim2.new(0.5, -160, 0.75, 0), BackgroundColor3 = CONFIG.UI.Colors.Header, BackgroundTransparency = 1, TextColor3 = CONFIG.UI.Colors.Text, TextTransparency = 1, Font = CONFIG.UI.Font, TextScaled = true, Visible = false, ZIndex = 10 }); CreateElement("UICorner", { Parent = self.UI.NotificationLabel })
 
-    self.UI.SettingsPanel = CreateElement("Frame", {
-        Name = "SettingsPanel",
-        Parent = self.UI.MainFrame,
-        Size = UDim2.new(1, -10, 1, -40),
-        Position = UDim2.new(0.5, 0, 0, 35),
-        AnchorPoint = Vector2.new(0.5, 0),
-        BackgroundColor3 = CONFIG.UI.Colors.Primary,
-        BorderSizePixel = 0,
-        Visible = false
-    })
-    CreateElement("UICorner", { CornerRadius = UDim.new(0, 6), Parent = self.UI.SettingsPanel })
+    -- Settings Panel Content
     CreateElement("UIPadding", { PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10), PaddingTop = UDim.new(0, 10), PaddingBottom = UDim.new(0, 10), Parent = self.UI.SettingsPanel })
     local settingsLayout = CreateElement("UIListLayout", {
         Parent = self.UI.SettingsPanel,
@@ -457,11 +572,12 @@ function PetTeamManager:Init()
     self.UI.SettingMaxPets = createSettingRow(self.UI.SettingsPanel, "Max Pets:", CONFIG.MAX_PETS, 4)
     self.UI.SettingPetFormationRadius = createSettingRow(self.UI.SettingsPanel, "Pet Formation Radius:", CONFIG.PET_FORMATION.Radius, 5)
     self.UI.SettingPetFormationVerticalOffset = createSettingRow(self.UI.SettingsPanel, "Pet Formation Vertical Offset:", CONFIG.PET_FORMATION.VerticalOffset, 6)
+    self.UI.SettingRepeatedBuyInterval = createSettingRow(self.UI.SettingsPanel, "Repeated Buy Interval:", CONFIG.REPEATED_BUY_INTERVAL, 7)
     local settingsButtonsFrame = CreateElement("Frame", {
         Parent = self.UI.SettingsPanel,
         Size = UDim2.new(1, 0, 0, 30),
         BackgroundTransparency = 1,
-        LayoutOrder = 7
+        LayoutOrder = 8
     })
     CreateElement("UIListLayout", { Parent = settingsButtonsFrame, FillDirection = Enum.FillDirection.Horizontal, SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 5), HorizontalAlignment = Enum.HorizontalAlignment.Center })
     local applySettingsBtn = CreateElement("TextButton", {
@@ -495,7 +611,19 @@ function PetTeamManager:Init()
         LayoutOrder = 3
     })
 
-    self:LoadTeams(); self:RefreshTeams(); self:RefreshPreview()
+    self:LoadTeams();
+    
+    -- Now that data is loaded, update the UI
+    self.UI.SettingEquipDelay.Text = tostring(CONFIG.EQUIP_DELAY)
+    self.UI.SettingNotifyDuration.Text = tostring(CONFIG.NOTIFY_DURATION)
+    self.UI.SettingAutoReequipInterval.Text = tostring(CONFIG.AUTO_REEQUIP_INTERVAL)
+    self.UI.SettingMaxPets.Text = tostring(CONFIG.MAX_PETS)
+    self.UI.SettingPetFormationRadius.Text = tostring(CONFIG.PET_FORMATION.Radius)
+    self.UI.SettingPetFormationVerticalOffset.Text = tostring(CONFIG.PET_FORMATION.VerticalOffset)
+    self.UI.SettingRepeatedBuyInterval.Text = tostring(CONFIG.REPEATED_BUY_INTERVAL)
+    self.UI.NumberBox.Text = tostring(CONFIG.MAX_PETS)
+
+    self:RefreshTeams(); self:RefreshPreview()
 
     if CONFIG.AUTO_TRACK_MANUAL_EQUIPS then
         local function setupCharacterListeners(character)
@@ -565,94 +693,43 @@ function PetTeamManager:Init()
         end
     end
     
+    local function switchView(viewName)
+        self.currentView = viewName
+        featurePanel.Visible = (viewName == "feature")
+        contentFrame.Visible = (viewName == "content")
+        settingsPanel.Visible = (viewName == "settings")
+
+        featureBtn.BackgroundColor3 = (viewName == "feature") and CONFIG.UI.Colors.Primary or CONFIG.UI.Colors.Header
+        contentBtn.BackgroundColor3 = (viewName == "content") and CONFIG.UI.Colors.Primary or CONFIG.UI.Colors.Header
+        settingsBtn.BackgroundColor3 = (viewName == "settings") and CONFIG.UI.Colors.Primary or CONFIG.UI.Colors.Header
+    end
+    
+    featureBtn.MouseButton1Click:Connect(function() switchView("feature") end)
+    contentBtn.MouseButton1Click:Connect(function() switchView("content") end)
+    settingsBtn.MouseButton1Click:Connect(function() switchView("settings") end)
+    closeSettingsBtn.MouseButton1Click:Connect(function() switchView("content") end)
+    
     minimizeBtn.MouseButton1Click:Connect(function()
         self.isMinimized = not self.isMinimized
         if self.isMinimized then
             self.UI.MainFrame.Size = UDim2.new(0, 200, 0, 30)
+            featurePanel.Visible = false
             contentFrame.Visible = false
-            self.UI.SettingsPanel.Visible = false
+            settingsPanel.Visible = false
             minimizeBtn.Text = "+"
         else
             self.UI.MainFrame.Size = UDim2.new(0, CONFIG.UI.InitialSize.X, 0, CONFIG.UI.InitialSize.Y)
-            if self.currentView == "main" then
+            if self.currentView == "content" then
                 contentFrame.Visible = true
-                self.UI.SettingsPanel.Visible = false
-            else
-                contentFrame.Visible = false
-                self.UI.SettingsPanel.Visible = true
+            elseif self.currentView == "feature" then
+                featurePanel.Visible = true
+            elseif self.currentView == "settings" then
+                settingsPanel.Visible = true
             end
             minimizeBtn.Text = "−"
         end
     end)
     
-    settingsBtn.MouseButton1Click:Connect(function()
-        self.currentView = "settings"
-        contentFrame.Visible = false
-        self.UI.SettingsPanel.Visible = true
-        self.isMinimized = false
-        self.UI.MainFrame.Size = UDim2.new(0, CONFIG.UI.InitialSize.X, 0, CONFIG.UI.InitialSize.Y)
-        minimizeBtn.Text = "−"
-        self:Notify("Settings panel opened.", CONFIG.UI.Colors.Info)
-        
-        self.UI.SettingEquipDelay.Text = tostring(CONFIG.EQUIP_DELAY)
-        self.UI.SettingNotifyDuration.Text = tostring(CONFIG.NOTIFY_DURATION)
-        self.UI.SettingAutoReequipInterval.Text = tostring(CONFIG.AUTO_REEQUIP_INTERVAL)
-        self.UI.SettingMaxPets.Text = tostring(CONFIG.MAX_PETS)
-        self.UI.SettingPetFormationRadius.Text = tostring(CONFIG.PET_FORMATION.Radius)
-        self.UI.SettingPetFormationVerticalOffset.Text = tostring(CONFIG.PET_FORMATION.VerticalOffset)
-    end)
-    
-    closeSettingsBtn.MouseButton1Click:Connect(function()
-        self.currentView = "main"
-        self.UI.SettingsPanel.Visible = false
-        contentFrame.Visible = true
-        self:Notify("Settings panel closed.", CONFIG.UI.Colors.Info)
-    end)
-
-    applySettingsBtn.MouseButton1Click:Connect(function()
-        local success = true
-        
-        local equipDelay = tonumber(self.UI.SettingEquipDelay.Text)
-        local notifyDuration = tonumber(self.UI.SettingNotifyDuration.Text)
-        local autoReequipInterval = tonumber(self.UI.SettingAutoReequipInterval.Text)
-        local maxPets = tonumber(self.UI.SettingMaxPets.Text)
-        local petFormationRadius = tonumber(self.UI.SettingPetFormationRadius.Text)
-        local petFormationVerticalOffset = tonumber(self.UI.SettingPetFormationVerticalOffset.Text)
-
-        if equipDelay and equipDelay >= 0 then CONFIG.EQUIP_DELAY = equipDelay else success = false end
-        if notifyDuration and notifyDuration >= 0 then CONFIG.NOTIFY_DURATION = notifyDuration else success = false end
-        if autoReequipInterval and autoReequipInterval >= 0 then CONFIG.AUTO_REEQUIP_INTERVAL = autoReequipInterval else success = false end
-        if maxPets and maxPets >= 1 then CONFIG.MAX_PETS = maxPets else success = false end
-        if petFormationRadius and petFormationRadius >= 0 then CONFIG.PET_FORMATION.Radius = petFormationRadius else success = false end
-        if petFormationVerticalOffset and petFormationVerticalOffset >= 0 then CONFIG.PET_FORMATION.VerticalOffset = petFormationVerticalOffset else success = false end
-
-        if success then
-            self:SaveSettings()
-            self:Notify("Settings applied and saved successfully.", CONFIG.UI.Colors.Success)
-            self.UI.NumberBox.Text = tostring(CONFIG.MAX_PETS)
-        else
-            self:Notify("Invalid input. Please enter valid numbers.", CONFIG.UI.Colors.Error)
-        end
-    end)
-    
-    resetSettingsBtn.MouseButton1Click:Connect(function()
-        self:ResetSettings()
-        self.UI.SettingEquipDelay.Text = tostring(CONFIG.EQUIP_DELAY)
-        self.UI.SettingNotifyDuration.Text = tostring(CONFIG.NOTIFY_DURATION)
-        self.UI.SettingAutoReequipInterval.Text = tostring(CONFIG.AUTO_REEQUIP_INTERVAL)
-        self.UI.SettingMaxPets.Text = tostring(CONFIG.MAX_PETS)
-        self.UI.SettingPetFormationRadius.Text = tostring(CONFIG.PET_FORMATION.Radius)
-        self.UI.SettingPetFormationVerticalOffset.Text = tostring(CONFIG.PET_FORMATION.VerticalOffset)
-        self.UI.NumberBox.Text = tostring(CONFIG.MAX_PETS)
-    end)
-
-    togglePreviewBtn.MouseButton1Click:Connect(function()
-        self.previewVisible = not self.previewVisible
-        midCol.Visible = self.previewVisible
-        togglePreviewBtn.Text = self.previewVisible and "👁 Preview: ON" or "🌑 Preview: OFF"
-        togglePreviewBtn.BackgroundColor3 = self.previewVisible and CONFIG.UI.Colors.Success or CONFIG.UI.Colors.Error
-        if self.previewVisible then self:RefreshPreview() end
-    end)
     self.UI.PetNameBox:GetPropertyChangedSignal("Text"):Connect(function() self:RefreshPreview() end)
 
     equipBtn.MouseButton1Click:Connect(function()
@@ -775,6 +852,72 @@ function PetTeamManager:Init()
                 self:EquipPets(self.QuickEquipTeam)
             end
             task.wait(CONFIG.AUTO_REEQUIP_INTERVAL)
+        end
+    end)
+    
+    applySettingsBtn.MouseButton1Click:Connect(function()
+        local success = true
+        
+        local equipDelay = tonumber(self.UI.SettingEquipDelay.Text)
+        local notifyDuration = tonumber(self.UI.SettingNotifyDuration.Text)
+        local autoReequipInterval = tonumber(self.UI.SettingAutoReequipInterval.Text)
+        local maxPets = tonumber(self.UI.SettingMaxPets.Text)
+        local petFormationRadius = tonumber(self.UI.SettingPetFormationRadius.Text)
+        local petFormationVerticalOffset = tonumber(self.UI.SettingPetFormationVerticalOffset.Text)
+        local repeatedBuyInterval = tonumber(self.UI.SettingRepeatedBuyInterval.Text)
+
+        if equipDelay and equipDelay >= 0 then CONFIG.EQUIP_DELAY = equipDelay else success = false end
+        if notifyDuration and notifyDuration >= 0 then CONFIG.NOTIFY_DURATION = notifyDuration else success = false end
+        if autoReequipInterval and autoReequipInterval >= 0 then CONFIG.AUTO_REEQUIP_INTERVAL = autoReequipInterval else success = false end
+        if maxPets and maxPets >= 1 then CONFIG.MAX_PETS = maxPets else success = false end
+        if petFormationRadius and petFormationRadius >= 0 then CONFIG.PET_FORMATION.Radius = petFormationRadius else success = false end
+        if petFormationVerticalOffset and petFormationVerticalOffset >= 0 then CONFIG.PET_FORMATION.VerticalOffset = petFormationVerticalOffset else success = false end
+        if repeatedBuyInterval and repeatedBuyInterval >= 0 then CONFIG.REPEATED_BUY_INTERVAL = repeatedBuyInterval else success = false end
+
+        if success then
+            self:SaveSettings()
+            self:Notify("Settings applied and saved successfully.", CONFIG.UI.Colors.Success)
+            self.UI.NumberBox.Text = tostring(CONFIG.MAX_PETS)
+        else
+            self:Notify("Invalid input. Please enter valid numbers.", CONFIG.UI.Colors.Error)
+        end
+    end)
+    
+    resetSettingsBtn.MouseButton1Click:Connect(function()
+        self:ResetSettings()
+        self.UI.SettingEquipDelay.Text = tostring(CONFIG.EQUIP_DELAY)
+        self.UI.SettingNotifyDuration.Text = tostring(CONFIG.NOTIFY_DURATION)
+        self.UI.SettingAutoReequipInterval.Text = tostring(CONFIG.AUTO_REEQUIP_INTERVAL)
+        self.UI.SettingMaxPets.Text = tostring(CONFIG.MAX_PETS)
+        self.UI.SettingPetFormationRadius.Text = tostring(CONFIG.PET_FORMATION.Radius)
+        self.UI.SettingPetFormationVerticalOffset.Text = tostring(CONFIG.PET_FORMATION.VerticalOffset)
+        self.UI.SettingRepeatedBuyInterval.Text = tostring(CONFIG.REPEATED_BUY_INTERVAL)
+        self.UI.NumberBox.Text = tostring(CONFIG.MAX_PETS)
+        -- Turn off all buttons visually
+        for _, button in pairs(self.UI.ShopToggleButtons) do
+            button.BackgroundColor3 = CONFIG.UI.Colors.Primary
+        end
+    end)
+
+    seedBtn.MouseButton1Click:Connect(function() self:ToggleShopLoop("Seed", seedBtn) end)
+    gearBtn.MouseButton1Click:Connect(function() self:ToggleShopLoop("Gear", gearBtn) end)
+    eggBtn.MouseButton1Click:Connect(function() self:ToggleShopLoop("Egg", eggBtn) end)
+    merchantBtn.MouseButton1Click:Connect(function() self:ToggleShopLoop("Merchant", merchantBtn) end)
+    eventBtn.MouseButton1Click:Connect(function() self:ToggleShopLoop("Event", eventBtn) end)
+
+    switchView("content")
+    
+    -- Restore active toggles from saved state
+    task.delay(0.5, function()
+        local togglesToRestore = table.clone(self.activeToggles)
+        self.activeToggles = {} -- Reset live state before re-toggling
+        for shopName, isActive in pairs(togglesToRestore) do
+            if isActive then
+                local button = self.UI.ShopToggleButtons[shopName]
+                if button then
+                    self:ToggleShopLoop(shopName, button)
+                end
+            end
         end
     end)
 end
