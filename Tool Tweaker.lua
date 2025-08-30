@@ -1,5 +1,5 @@
 --[[
-Tool Tweaks 3.2 - Simplified by Gemini
+Tool Tweaks 3.2 - Simplified
 
 Features:
 - Minimizable UI: Toggles between the full panel and a small, draggable cube.
