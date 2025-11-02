@@ -1,30 +1,3 @@
---[[
-Tool Tweaks 3.2 - Simplified
-
-Features:
-- Minimizable UI: Toggles between the full panel and a small, draggable cube.
-- Direct Value Input: Click a value box, type a number, and press Enter to set it.
-- Simplified single-panel UI with tabs for Position and Rotation.
-- Draggable relative sliders for smooth, continuous adjustments.
-- Pressure-sensitive buttons: Hold to continuously apply changes.
-- Clean, modern, and simplified visual design.
-- Added a "Freeze Camera" button to lock the camera's position for precise adjustments.
-- Re-execution Support: The script now checks for and removes old UI instances when re-executed.
-
-Bug Fixes:
-- Fixed the minimized cube not responding to clicks. It is now a button.
-- Fixed an issue where dragging a slider would also drag the entire UI panel.
-- Fixed an issue where dragging one slider would not prevent other sliders from also being "active."
-- Fixed the slider and button logic to apply all movements and rotations relative to the world axes, preventing "flipping" behavior.
-- **Fixed a calculation error where the slider's position was being read incorrectly. The script now correctly determines the direction from the mouse's position relative to the slider track, ensuring left always decreases the value and right always increases it.**
-
-Credits:
-- MrMeme: Creator of the original UI before redesign and some bits of the Rotation and Position code
-- Chat dev: Original Position and Rotation code Added FE smoothing method (0.03s re-equip trick) for live tool grip updates
-- (G): UI Redesign, slider code, freeze button code, and overall bug fixes/refinements
-- Chillz: Inspiration for the script
-]]
-
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
@@ -33,7 +6,6 @@ local UserInputService = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- Remove previous UI if re-executed
 local existingGui = playerGui:FindFirstChild("ToolTweaks")
 if existingGui then
     existingGui:Destroy()
@@ -45,7 +17,6 @@ gui.Parent = playerGui
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.ResetOnSpawn = false
 
--- Helper module
 local CenterModule = {}
 
 function CenterModule:GetCurrentTool()
@@ -55,11 +26,9 @@ function CenterModule:GetCurrentTool()
     if tool and tool:IsA("Tool") and tool.Grip then
         return tool
     end
-    -- fallback: sometimes tool lives in Backpack and is equipped quickly; still return nil here
     return nil
 end
 
--- Rotation tracker for infinite rotation
 local rotationTracker = { X = 0, Y = 0, Z = 0 }
 
 local function syncRotationWithTool(tool)
@@ -72,7 +41,6 @@ local function syncRotationWithTool(tool)
     end
 end
 
--- Drag frame helper (prevents dragging when slider is active)
 local isSliderDragging = false
 local activeSliderThumb = nil
 
@@ -115,7 +83,6 @@ function CenterModule:EnableDragFrame(frame)
     end)
 end
 
--- Tween grip and force-equip to replicate on FE
 local function tweenGrip(tool, newGrip)
     if not tool then return end
     local tweenInfo = TweenInfo.new(0.05, Enum.EasingStyle.Linear)
@@ -133,7 +100,6 @@ local function tweenGrip(tool, newGrip)
     end
 end
 
--- === UI ===
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, 350, 0, 320)
@@ -202,7 +168,6 @@ minimizedCube.MouseButton1Click:Connect(function()
     mainFrame.Visible = true
 end)
 
--- Tabs
 local tabsContainer = Instance.new("Frame", mainFrame)
 tabsContainer.Name = "TabsContainer"
 tabsContainer.Size = UDim2.new(1, 0, 0, 30)
@@ -238,7 +203,6 @@ rotButton.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
 local rotCorner = Instance.new("UICorner", rotButton)
 rotCorner.CornerRadius = UDim.new(0, 4)
 
--- Freeze camera button later appended to tabsContainer
 local freezeButton = Instance.new("TextButton", tabsContainer)
 freezeButton.Name = "FreezeCameraButton"
 freezeButton.Size = UDim2.new(0, 110, 0, 25)
@@ -250,7 +214,6 @@ freezeButton.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
 local freezeCorner = Instance.new("UICorner", freezeButton)
 freezeCorner.CornerRadius = UDim.new(0, 4)
 
--- Pages
 local pages = Instance.new("Frame", mainFrame)
 pages.Name = "Pages"
 pages.Size = UDim2.new(1, -10, 1, -110)
@@ -274,7 +237,6 @@ local rotPageLayout = Instance.new("UIListLayout", rotPage)
 rotPageLayout.Padding = UDim.new(0, 8)
 rotPageLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
--- Increment input
 local incrementInput = Instance.new("TextBox", mainFrame)
 incrementInput.Name = "IncrementInput"
 incrementInput.Size = UDim2.new(1, -10, 0, 30)
@@ -288,7 +250,6 @@ incrementInput.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 local incCorner = Instance.new("UICorner", incrementInput)
 incCorner.CornerRadius = UDim.new(0, 4)
 
--- Tab switching
 posButton.MouseButton1Click:Connect(function()
     posPage.Visible = true
     rotPage.Visible = false
@@ -309,7 +270,6 @@ rotButton.MouseButton1Click:Connect(function()
     incrementInput.Text = "1"
 end)
 
--- Create control rows
 local allSliders = {}
 local function createControlRow(parent, axis, axisColor)
     local row = Instance.new("Frame", parent)
@@ -394,13 +354,11 @@ local function createControlRow(parent, axis, axisColor)
     }
 end
 
--- Setup controls (buttons, input, slider)
 local function setupControls(controls, axis, isRotation)
     local function applyChange(tool, change)
         if not tool or not tool.Grip then return end
         local newGrip
         if isRotation then
-            -- Cumulative tracked rotation (degrees)
             rotationTracker[axis] = rotationTracker[axis] + change
             newGrip = CFrame.new(tool.Grip.Position) *
                 CFrame.fromEulerAnglesXYZ(
@@ -458,7 +416,6 @@ local function setupControls(controls, axis, isRotation)
             local rx, ry, rz = tool.Grip:ToEulerAnglesXYZ()
 
             if isRotation then
-                -- Set tracked rotation directly
                 rotationTracker[axis] = value
                 local newGrip = CFrame.new(pos) * CFrame.fromEulerAnglesXYZ(
                     math.rad(rotationTracker.X),
@@ -477,7 +434,6 @@ local function setupControls(controls, axis, isRotation)
         end
     end)
 
-    -- Slider dragging logic
     local thumb = controls.SliderThumb
     local track = controls.SliderTrack
     local dragConnection = nil
@@ -514,7 +470,7 @@ local function setupControls(controls, axis, isRotation)
                         local trackWidth = track.AbsoluteSize.X
                         local relativeMouseX = mouseX - trackX
                         local normalizedPos = math.clamp(relativeMouseX / math.max(trackWidth, 1), 0, 1)
-                        local changeRate = (normalizedPos - 0.5) * 2 -- -1 to 1
+                        local changeRate = (normalizedPos - 0.5) * 2
                         local increment = math.abs(tonumber(incrementInput.Text) or (isRotation and 1 or 0.1))
                         local totalChange = changeRate * increment * 10 * dt
                         applyChange(tool, totalChange)
@@ -523,7 +479,6 @@ local function setupControls(controls, axis, isRotation)
 
                 endConnection = UserInputService.InputEnded:Connect(function(inputEnded)
                     if isSliderDragging and activeSliderThumb == thumb and (inputEnded.UserInputType == Enum.UserInputType.MouseButton1 or inputEnded.UserInputType == Enum.UserInputType.Touch) then
-                        -- cleanup
                         isSliderDragging = false
                         activeSliderThumb = nil
 
@@ -554,7 +509,6 @@ local function setupControls(controls, axis, isRotation)
     end)
 end
 
--- Build controls
 local posControls = {
     X = createControlRow(posPage, "X", Color3.fromRGB(255, 75, 75)),
     Y = createControlRow(posPage, "Y", Color3.fromRGB(75, 255, 75)),
@@ -575,7 +529,6 @@ setupControls(rotControls.X, "X", true)
 setupControls(rotControls.Y, "Y", true)
 setupControls(rotControls.Z, "Z", true)
 
--- Camera freeze helpers
 local camera = workspace.CurrentCamera
 local frozen = false
 local camPart = nil
@@ -626,14 +579,12 @@ freezeButton.MouseButton1Click:Connect(function()
     frozen = not frozen
 end)
 
--- Keep track of tool changes and update UI
 local currentToolRef = nil
 RunService.RenderStepped:Connect(function()
     local tool = CenterModule:GetCurrentTool()
     if tool ~= currentToolRef then
         currentToolRef = tool
         if tool then
-            -- sync rotation tracker to tool when new tool is detected
             syncRotationWithTool(tool)
         end
     end
